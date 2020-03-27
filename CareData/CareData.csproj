@@ -54,12 +54,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BarCode.cs" />
+    <Compile Include="Category.cs" />
+    <Compile Include="Customer.cs" />
     <Compile Include="IdentityModels.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="Migrations\202003272238446_AddedTwoTables.cs" />
+    <Compile Include="Migrations\202003272238446_AddedTwoTables.Designer.cs">
+      <DependentUpon>202003272238446_AddedTwoTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003272318126_AddedAllTables.cs" />
+    <Compile Include="Migrations\202003272318126_AddedAllTables.Designer.cs">
+      <DependentUpon>202003272318126_AddedAllTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="OrderDetail.cs" />
+    <Compile Include="OrderHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubCategory.cs" />
+    <Compile Include="TimeSlot.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202003272238446_AddedTwoTables.resx">
+      <DependentUpon>202003272238446_AddedTwoTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003272318126_AddedAllTables.resx">
+      <DependentUpon>202003272318126_AddedAllTables.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -35,8 +35,8 @@ namespace CareData
         public DbSet<BarCode> BarCodes { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<TimeSlot> TimeSlots { get; set; }
-        public DbSet<Catagory> Catagories { get; set; }
-        public DbSet<SubCatagory> SubCatagories { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<SubCategory> SubCategories { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<OrderHeader> OrderHeaders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
