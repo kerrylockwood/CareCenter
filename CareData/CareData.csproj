@@ -67,6 +67,18 @@
     <Compile Include="Migrations\202003272318126_AddedAllTables.Designer.cs">
       <DependentUpon>202003272318126_AddedAllTables.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003301354308_AddCreateTimesToTables.cs" />
+    <Compile Include="Migrations\202003301354308_AddCreateTimesToTables.Designer.cs">
+      <DependentUpon>202003301354308_AddCreateTimesToTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003301438276_AddAnnotations.cs" />
+    <Compile Include="Migrations\202003301438276_AddAnnotations.Designer.cs">
+      <DependentUpon>202003301438276_AddAnnotations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003301828016_AddedColumns.cs" />
+    <Compile Include="Migrations\202003301828016_AddedColumns.Designer.cs">
+      <DependentUpon>202003301828016_AddedColumns.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OrderDetail.cs" />
     <Compile Include="OrderHeader.cs" />
@@ -84,6 +96,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003272318126_AddedAllTables.resx">
       <DependentUpon>202003272318126_AddedAllTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003301354308_AddCreateTimesToTables.resx">
+      <DependentUpon>202003301354308_AddCreateTimesToTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003301438276_AddAnnotations.resx">
+      <DependentUpon>202003301438276_AddAnnotations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003301828016_AddedColumns.resx">
+      <DependentUpon>202003301828016_AddedColumns.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -54,6 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BarCodes\BarCodeCreate.cs" />
+    <Compile Include="BarCodes\BarCodeDetail.cs" />
+    <Compile Include="BarCodes\BarCodeList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

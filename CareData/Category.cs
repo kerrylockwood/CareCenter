@@ -14,5 +14,11 @@ namespace CareData
 
         [Required]
         public string CategoryName { get; set; }
+
+        [Required]
+        public Guid CreateBy { get; set; }
+
+        [Required]
+        public DateTimeOffset CreateAt { get; set; }
     }
 }

@@ -5,20 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CareData
+namespace CareModels.BarCodes
 {
-    public class BarCode
+    public class BarCodeList
     {
         [Key]
         public int BarCodeId { get; set; }
 
         [Required]
+        [Display(Name ="BarCode")]
         public int BarCodeNumber { get; set; }
-
-        [Required]
-        public Guid CreateBy { get; set; }
-
-        [Required]
-        public DateTimeOffset CreateAt { get; set; }
     }
 }

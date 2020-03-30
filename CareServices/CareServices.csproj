@@ -54,11 +54,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BarCodeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CareData\CareData.csproj">
+      <Project>{48ea0779-b75f-4dd1-a9ba-3d0e1d28de1d}</Project>
+      <Name>CareData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CareModels\CareModels.csproj">
+      <Project>{a2ed61ff-1d1a-473d-9210-949001b6c6a1}</Project>
+      <Name>CareModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

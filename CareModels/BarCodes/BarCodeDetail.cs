@@ -5,26 +5,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CareData
+namespace CareModels.BarCodes
 {
-    public class TimeSlot
+    public class BarCodeDetail
     {
         [Key]
-        public int SlotId { get; set; }
+        public int BarCodeId { get; set; }
 
         [Required]
-        public int DayOfWeek { get; set; }
+        [Display(Name = "BarCode")]
+        public int BarCodeNumber { get; set; }
 
         [Required]
-        public TimeSpan Time { get; set; }
-
-        [Required]
-        public int MaxPerSlot { get; set; }
-
-        [Required]
+        [Display(Name ="Created By")]
         public Guid CreateBy { get; set; }
 
         [Required]
+        //[DisplayFormat(DateTime)]
         public DateTimeOffset CreateAt { get; set; }
     }
 }
