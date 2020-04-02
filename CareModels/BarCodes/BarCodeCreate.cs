@@ -12,11 +12,5 @@ namespace CareModels.BarCodes
         [Required]
         [Display(Name = "BarCode")]
         public int BarCodeNumber { get; set; }
-
-        [Required]
-        public Guid CreateBy { get; set; }
-
-        [Required]
-        public DateTimeOffset CreateAt { get; set; }
     }
 }

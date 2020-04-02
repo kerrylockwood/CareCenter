@@ -15,8 +15,7 @@ namespace GraceCareCenterOrder.Controllers
         // GET: BarCode
         public ActionResult Index()
         {
-            var userId = Guid.Parse(User.Identity.GetUserId());
-            var service = new BarCodeService(userId);
+            var service = CreateBarCodeService();
             var model = service.GetBarCodes();
             return View(model);
         }
@@ -74,7 +73,7 @@ namespace GraceCareCenterOrder.Controllers
         // Create BarCode Service
         private BarCodeService CreateBarCodeService()
         {
-            var userId = Guid.Parse(User.Identity.GetUserId());
+            var userId = User.Identity.GetUserId();
             var service = new BarCodeService(userId);
             return service;
         }

@@ -42,8 +42,9 @@ namespace CareData
         [Required]
         public bool Deliver { get; set; }
 
-        [Required]
-        public Guid CreateBy { get; set; }
+        [ForeignKey(nameof(User))]
+        public string CreateBy { get; set; }
+        public virtual ApplicationUser User { get; set; }
 
         [Required]
         public DateTimeOffset CreatedAt { get; set; }

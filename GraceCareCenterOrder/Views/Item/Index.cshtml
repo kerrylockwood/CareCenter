@@ -1,0 +1,74 @@
+﻿@model IEnumerable<CareModels.Items.ItemList>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+@if (TempData.ContainsKey("SaveResult"))
+{
+    <div class="Alert alert-success fade in" role="alert">
+        @ViewBag.SaveResult
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+        @TempData["SaveResult"]
+    </div>
+}
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.CategoryName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SubCatName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ItemName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsleNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MaxAllowed)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PointCost)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubCatName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsleNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaxAllowed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PointCost)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ItemId }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ItemId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ItemId })
+            </td>
+        </tr>
+    }
+
+</table>

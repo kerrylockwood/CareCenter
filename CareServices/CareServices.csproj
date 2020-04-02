@@ -55,7 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BarCodeService.cs" />
+    <Compile Include="CategoryService.cs" />
+    <Compile Include="ItemService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubCatService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

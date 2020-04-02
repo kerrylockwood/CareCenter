@@ -57,11 +57,30 @@
     <Compile Include="BarCodes\BarCodeCreate.cs" />
     <Compile Include="BarCodes\BarCodeDetail.cs" />
     <Compile Include="BarCodes\BarCodeList.cs" />
+    <Compile Include="Categories\CategoryCreate.cs" />
+    <Compile Include="Categories\CategoryDetail.cs" />
+    <Compile Include="Categories\CategoryList.cs" />
+    <Compile Include="Categories\CategoryUpdate.cs" />
+    <Compile Include="Items\ItemCreate.cs" />
+    <Compile Include="Items\ItemDetail.cs" />
+    <Compile Include="Items\ItemList.cs" />
+    <Compile Include="Items\ItemUpdate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubCategories\CatSubCatList.cs" />
+    <Compile Include="SubCategories\SubCatCreate.cs" />
+    <Compile Include="SubCategories\SubCatDetail.cs" />
+    <Compile Include="SubCategories\SubCatList.cs" />
+    <Compile Include="SubCategories\SubCatUpdate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CareData\CareData.csproj">
+      <Project>{48EA0779-B75F-4DD1-A9BA-3D0E1D28DE1D}</Project>
+      <Name>CareData</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

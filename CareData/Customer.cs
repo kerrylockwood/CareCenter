@@ -13,6 +13,7 @@ namespace CareData
         [Key]
         public int CustomerId { get; set; }
 
+        [Required]
         public int BarCodeId { get; set; }
         [ForeignKey(nameof(BarCodeId))]
         public virtual BarCode BarCode { get; set; }
@@ -62,8 +63,9 @@ namespace CareData
         [Required]
         public DateTimeOffset CreatedAt { get; set; }
 
-        [Required]
-        public Guid CreateBy { get; set; }
+        [ForeignKey(nameof(User))]
+        public string CreateBy { get; set; }
+        public virtual ApplicationUser User { get; set; }
 
         [Required]
         public DateTimeOffset CreateAt { get; set; }

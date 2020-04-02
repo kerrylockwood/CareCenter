@@ -79,6 +79,30 @@
     <Compile Include="Migrations\202003301828016_AddedColumns.Designer.cs">
       <DependentUpon>202003301828016_AddedColumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003311628396_TryToFixUserId.cs" />
+    <Compile Include="Migrations\202003311628396_TryToFixUserId.Designer.cs">
+      <DependentUpon>202003311628396_TryToFixUserId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003311754416_ChgGuidToString1.cs" />
+    <Compile Include="Migrations\202003311754416_ChgGuidToString1.Designer.cs">
+      <DependentUpon>202003311754416_ChgGuidToString1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003311757261_ChgGuidToString2.cs" />
+    <Compile Include="Migrations\202003311757261_ChgGuidToString2.Designer.cs">
+      <DependentUpon>202003311757261_ChgGuidToString2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003311921256_ChgAllTablesUserToString1.cs" />
+    <Compile Include="Migrations\202003311921256_ChgAllTablesUserToString1.Designer.cs">
+      <DependentUpon>202003311921256_ChgAllTablesUserToString1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003311957164_RemoveRequiredOnCreateBy.cs" />
+    <Compile Include="Migrations\202003311957164_RemoveRequiredOnCreateBy.Designer.cs">
+      <DependentUpon>202003311957164_RemoveRequiredOnCreateBy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202004021302496_ChangePointsToDouble.cs" />
+    <Compile Include="Migrations\202004021302496_ChangePointsToDouble.Designer.cs">
+      <DependentUpon>202004021302496_ChangePointsToDouble.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OrderDetail.cs" />
     <Compile Include="OrderHeader.cs" />
@@ -105,6 +129,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003301828016_AddedColumns.resx">
       <DependentUpon>202003301828016_AddedColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003311628396_TryToFixUserId.resx">
+      <DependentUpon>202003311628396_TryToFixUserId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003311754416_ChgGuidToString1.resx">
+      <DependentUpon>202003311754416_ChgGuidToString1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003311757261_ChgGuidToString2.resx">
+      <DependentUpon>202003311757261_ChgGuidToString2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003311921256_ChgAllTablesUserToString1.resx">
+      <DependentUpon>202003311921256_ChgAllTablesUserToString1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003311957164_RemoveRequiredOnCreateBy.resx">
+      <DependentUpon>202003311957164_RemoveRequiredOnCreateBy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004021302496_ChangePointsToDouble.resx">
+      <DependentUpon>202004021302496_ChangePointsToDouble.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

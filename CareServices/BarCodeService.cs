@@ -10,9 +10,9 @@ namespace CareServices
 {
     public class BarCodeService
     {
-        private readonly Guid _userId;
+        private readonly string _userId;
 
-        public BarCodeService(Guid userId)
+        public BarCodeService(string userId)
         {
             _userId = userId;
         }
@@ -67,8 +67,8 @@ namespace CareServices
                         BarCodeId = entity.BarCodeId,
                         BarCodeNumber = entity.BarCodeNumber,
                         CreateAt = entity.CreateAt,
-                        CreateBy = entity.CreateBy
-                    };
+                        CreateName = entity.User.UserName
+            };
             }
         }
 
