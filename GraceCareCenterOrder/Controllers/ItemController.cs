@@ -1,9 +1,13 @@
-﻿using CareModels.Items;
+﻿using CareData;
+using CareModels.Items;
 using CareServices;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 
@@ -32,6 +36,19 @@ namespace GraceCareCenterOrder.Controllers
             var sortedCatagoryList = sortedCatSubCatList.OrderBy(o => o.Text);
 
             ViewBag.SubCatId = sortedCatSubCatList;
+
+            //Type type = typeof(Item);
+            //PropertyInfo[] propertyInfo = type.GetProperties();
+
+            //foreach (PropertyInfo pInfo in propertyInfo)
+            //{
+            //    string test = pInfo.Name;
+            //}
+            //var test = "xx";
+            //var xxx = GetPropertyName(item.);
+            //Expression<Func<CareData.Item, System.ComponentModel.DataAnnotations.DisplayAttribute>> expression = i => i.MaxAllowed;
+            //var name = GetPropertyName<DisplayAttribute>(expression);
+            //var maxItems = CareData.Item
 
             return View();
         }
@@ -146,6 +163,18 @@ namespace GraceCareCenterOrder.Controllers
             var userId = User.Identity.GetUserId();
             var service = new ItemService(userId);
             return service;
+        }
+
+        public static string GetPropertyName<T>(Expression<Func<T>> expression)
+        {
+            MemberExpression propertyExpression = (MemberExpression)expression.Body;
+            MemberInfo propertyMember = propertyExpression.Member;
+
+            Object[] displayAttributes = propertyMember.GetCustomAttributes(typeof(DisplayAttribute), true);
+            if (displayAttributes != null && displayAttributes.Length == 1)
+                return ((DisplayAttribute)displayAttributes[0]).Name;
+
+            return propertyMember.Name;
         }
     }
 }

@@ -75,7 +75,7 @@ namespace CareServices
             var entity =
                 new Item()
                 {
-                    ItemId = model.ItemId,
+                    //ItemId = model.ItemId,
                     SubCatId = model.SubCatId,
                     ItemName = model.ItemName,
                     IsleNumber = model.IsleNumber,

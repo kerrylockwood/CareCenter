@@ -23,19 +23,15 @@ namespace CareData
         [ForeignKey(nameof(SlotId))]
         public virtual TimeSlot TimeSlot { get; set; }
 
-        [Required]
         [MaxLength(1000, ErrorMessage ="Please limit your comment to 1000 characters")]
         public string MostWantedNotes { get; set; }
 
-        [Required]
         [MaxLength(1000, ErrorMessage = "Please limit your comment to 1000 characters")]
         public string FreezerNotes { get; set; }
 
-        [Required]
         [MaxLength(1000, ErrorMessage = "Please limit your comment to 1000 characters")]
         public string ProduceNotes { get; set; }
 
-        [Required]
         [MaxLength(1000, ErrorMessage = "Please limit your comment to 1000 characters")]
         public string NonFoodNotes { get; set; }
 

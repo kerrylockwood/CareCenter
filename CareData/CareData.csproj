@@ -103,6 +103,14 @@
     <Compile Include="Migrations\202004021302496_ChangePointsToDouble.Designer.cs">
       <DependentUpon>202004021302496_ChangePointsToDouble.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004021841073_ModCustomerTable.cs" />
+    <Compile Include="Migrations\202004021841073_ModCustomerTable.Designer.cs">
+      <DependentUpon>202004021841073_ModCustomerTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202004031528081_RemoveRequiredFromOrderHeader.cs" />
+    <Compile Include="Migrations\202004031528081_RemoveRequiredFromOrderHeader.Designer.cs">
+      <DependentUpon>202004031528081_RemoveRequiredFromOrderHeader.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OrderDetail.cs" />
     <Compile Include="OrderHeader.cs" />
@@ -147,6 +155,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004021302496_ChangePointsToDouble.resx">
       <DependentUpon>202004021302496_ChangePointsToDouble.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004021841073_ModCustomerTable.resx">
+      <DependentUpon>202004021841073_ModCustomerTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004031528081_RemoveRequiredFromOrderHeader.resx">
+      <DependentUpon>202004031528081_RemoveRequiredFromOrderHeader.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

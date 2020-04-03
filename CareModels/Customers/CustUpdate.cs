@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CareData;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,24 +7,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CareData
+namespace CareModels.Customers
 {
-    public class Customer
+    public class CustUpdate
     {
         [Key]
         public int CustomerId { get; set; }
 
-        [Required]
+        [Display(Name = "Bar Code")]
         public int BarCodeId { get; set; }
         [ForeignKey(nameof(BarCodeId))]
         public virtual BarCode BarCode { get; set; }
 
         [Required]
-        [MinLength(2, ErrorMessage ="First Name must contain at least 2 characters")]
-        [MaxLength(20, ErrorMessage ="First Name can only be 20 characters long")]
+        [Display(Name = "First Name")]
+        [MinLength(2, ErrorMessage = "First Name must contain at least 2 characters")]
+        [MaxLength(20, ErrorMessage = "First Name can only be 20 characters long")]
         public string FirstName { get; set; }
 
         [Required]
+        [Display(Name = "Last Name")]
         [MinLength(2, ErrorMessage = "Last Name must contain at least 2 characters")]
         [MaxLength(50, ErrorMessage = "Last Name can only be 50 characters long")]
         public string LastName { get; set; }
@@ -44,7 +47,8 @@ namespace CareData
         public string State { get; set; }
 
         [Required]
-        [Range(0,99999)]
+        [Display(Name = "Last Name")]
+        [Range(0, 99999, ErrorMessage = "Please enter a Valid ZIP Code")]
         public int ZipCode { get; set; }
 
         [Required]
@@ -57,14 +61,8 @@ namespace CareData
         public string Email { get; set; }
 
         [Required]
-        [Range(0,5)]
+        [Display(Name = "Number of Children")]
+        [Range(0, 5)]
         public int NumberKids { get; set; }
-
-        [ForeignKey(nameof(User))]
-        public string CreateBy { get; set; }
-        public virtual ApplicationUser User { get; set; }
-
-        [Required]
-        public DateTimeOffset CreateAt { get; set; }
     }
 }

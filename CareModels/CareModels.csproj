@@ -61,10 +61,16 @@
     <Compile Include="Categories\CategoryDetail.cs" />
     <Compile Include="Categories\CategoryList.cs" />
     <Compile Include="Categories\CategoryUpdate.cs" />
+    <Compile Include="Customers\CustBarCode.cs" />
+    <Compile Include="Customers\CustCreate.cs" />
+    <Compile Include="Customers\CustDetail.cs" />
+    <Compile Include="Customers\CustList.cs" />
+    <Compile Include="Customers\CustUpdate.cs" />
     <Compile Include="Items\ItemCreate.cs" />
     <Compile Include="Items\ItemDetail.cs" />
     <Compile Include="Items\ItemList.cs" />
     <Compile Include="Items\ItemUpdate.cs" />
+    <Compile Include="Orders\OrderList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubCategories\CatSubCatList.cs" />
     <Compile Include="SubCategories\SubCatCreate.cs" />
