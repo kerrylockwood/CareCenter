@@ -1,33 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CareData
+namespace CareModels.TimeSlots
 {
-    public class TimeSlot
+    public class SlotUpdate
     {
         [Key]
         public int SlotId { get; set; }
 
         [Required]
+        [Display(Name = "Day Of Week")]
         public int DayOfWeekNum { get; set; }
 
         [Required]
+        [Display(Name = "Time")]
         public TimeSpan Time { get; set; }
 
         [Required]
+        [Display(Name = "Max Pickups per Slot")]
         public int MaxPerSlot { get; set; }
-
-        [Required]
-        [ForeignKey(nameof(User))]
-        public string CreateBy { get; set; }
-        public virtual ApplicationUser User { get; set; }
-
-        [Required]
-        public DateTimeOffset CreateAt { get; set; }
     }
 }

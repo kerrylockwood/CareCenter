@@ -176,6 +176,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\SubCatController.cs" />
+    <Compile Include="Controllers\TimeSlotController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -266,6 +267,11 @@
     <Content Include="Views\Customer\Edit.cshtml" />
     <Content Include="Views\Customer\Delete.cshtml" />
     <Content Include="Views\Order\Index.cshtml" />
+    <Content Include="Views\TimeSlot\Index.cshtml" />
+    <Content Include="Views\TimeSlot\Create.cshtml" />
+    <Content Include="Views\TimeSlot\Details.cshtml" />
+    <Content Include="Views\TimeSlot\Edit.cshtml" />
+    <Content Include="Views\TimeSlot\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

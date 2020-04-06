@@ -52,7 +52,7 @@ namespace GraceCareCenterOrder.Controllers
         // Get: Customer/Create
         public ActionResult Create()
         {
-            ViewBag.BarCodeId = BuildBarCodeDropdown();
+            ViewBag.BarCodeId = BuildBarCodeDropdown(0);
 
             return View();
         }
@@ -71,7 +71,7 @@ namespace GraceCareCenterOrder.Controllers
             {
                 ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
 
-                ViewBag.BarCodeId = BuildBarCodeDropdown();
+                ViewBag.BarCodeId = BuildBarCodeDropdown(0);
 
                 return View(model);
             }
@@ -83,7 +83,7 @@ namespace GraceCareCenterOrder.Controllers
 
             ModelState.AddModelError("", $"'{model.FirstName} {model.LastName}' could not be created.");
 
-            ViewBag.BarCodeId = BuildBarCodeDropdown();
+            ViewBag.BarCodeId = BuildBarCodeDropdown(0);
 
             return View(model);
         }
@@ -118,7 +118,7 @@ namespace GraceCareCenterOrder.Controllers
                     NumberKids = detail.NumberKids
                 };
 
-            ViewBag.BarCodeId = BuildBarCodeDropdown();
+            ViewBag.BarCodeId = BuildBarCodeDropdown(detail.BarCodeId);
 
             return View(model);
         }
@@ -139,11 +139,11 @@ namespace GraceCareCenterOrder.Controllers
             var service = CreateCustomerService();
 
             CustDetail existingCustDetail = service.GetCustByBarCodeId(model.BarCodeId);
-            if (existingCustDetail != null && existingCustDetail.BarCodeId != id)
+            if (existingCustDetail != null && existingCustDetail.CustomerId != id)
             {
                 ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
 
-                ViewBag.BarCodeId = BuildBarCodeDropdown();
+                ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
 
                 return View(model);
             }
@@ -155,7 +155,7 @@ namespace GraceCareCenterOrder.Controllers
 
             ModelState.AddModelError("", $"'{model.FirstName} {model.LastName}' could not be updated.");
 
-            ViewBag.BarCodeId = BuildBarCodeDropdown();
+            ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
 
             return View(model);
         }
@@ -193,12 +193,12 @@ namespace GraceCareCenterOrder.Controllers
         }
 
         // Build BarCode Dropdown
-        private IOrderedEnumerable<SelectListItem> BuildBarCodeDropdown()
+        private IOrderedEnumerable<SelectListItem> BuildBarCodeDropdown(int selectedValue)
         {
             var userId = User.Identity.GetUserId();
             var barCodeService = new BarCodeService(userId);
 
-            var barCodeList = new SelectList(barCodeService.GetBarCodes(), "BarCodeId", "BarCodeNumber");
+            var barCodeList = new SelectList(barCodeService.GetBarCodes(), "BarCodeId", "BarCodeNumber", selectedValue);
             var sortedBarCodeList = barCodeList.OrderBy(o => o.Text);
 
             return sortedBarCodeList;

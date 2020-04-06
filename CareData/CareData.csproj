@@ -111,6 +111,10 @@
     <Compile Include="Migrations\202004031528081_RemoveRequiredFromOrderHeader.Designer.cs">
       <DependentUpon>202004031528081_RemoveRequiredFromOrderHeader.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004031923225_ChgTimeSlot.cs" />
+    <Compile Include="Migrations\202004031923225_ChgTimeSlot.Designer.cs">
+      <DependentUpon>202004031923225_ChgTimeSlot.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OrderDetail.cs" />
     <Compile Include="OrderHeader.cs" />
@@ -161,6 +165,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004031528081_RemoveRequiredFromOrderHeader.resx">
       <DependentUpon>202004031528081_RemoveRequiredFromOrderHeader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004031923225_ChgTimeSlot.resx">
+      <DependentUpon>202004031923225_ChgTimeSlot.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

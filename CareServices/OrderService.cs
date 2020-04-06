@@ -31,14 +31,22 @@ namespace CareServices
                                     OrderId = e.OrderId,
                                     CustId = e.CustId,
                                     SlotId = e.SlotId,
+                                    CreateDateTime = e.CreatedAt,
+                                    //SlotDateTime = ConvertSlotToDateTime(e.SlotId, e.CreatedAt.DateTime),
                                     CustFirstName = e.Customer.FirstName,
                                     CustLastName = e.Customer.LastName,
+                                    Deliver = e.Deliver,
                                     PullStarted = (e.PullStartedAt == null) ? false : true,
                                     PullCompleted = (e.OrderCompletedAt == null) ? false : true
                                 }
                         );
 
-                return query.ToArray();
+                var slotArray = query.ToArray();
+                foreach (var item in slotArray)
+                {
+                    item.SlotDateTime = ConvertSlotToDateTime(item.SlotId, item.CreateDateTime.DateTime);
+                }
+                return slotArray;
             }
         }
 
@@ -121,5 +129,46 @@ namespace CareServices
         //        return ctx.SaveChanges() == 1;
         //    }
         //}
+
+        // Get Slot Date/Time from Slot DayOfWeek
+        public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime)
+        {
+            //*******get slot info here
+            TimeSpan Time = new TimeSpan(19, 00, 00);
+            int DayOfWeek = 7;
+            //*******get slot info here
+
+            DateTime weekStartDate = GetWeekStartDate(createDateTime);
+
+            return weekStartDate.AddDays(DayOfWeek).Add(Time);
+        }
+
+        // Get Slot Date/Time from Slot DayOfWeek
+        public DateTime GetWeekStartDate(DateTime createDateTime)
+        {
+            // Assumption: Customers can start creating orders on the
+            //    day after the last Pickup Slot day and Pickups start
+            //    as early as Sunday
+            // Get Sunday Date based on date passed in (should be either
+            //    Create Date or current date if creating now)
+            //*******get *last* slot here
+            TimeSpan lastSlotTime = new TimeSpan(19, 00, 00);
+            int lastSlotDayOfWeek = 7;
+            //*******get *last* slot here
+
+            int createDayOfWeek = (int)createDateTime.DayOfWeek;
+            DateTime weekStartDate
+                = createDateTime.Date.AddDays(createDayOfWeek * -1);
+            DateTime orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek).Add(lastSlotTime).AddMinutes(-60);
+
+            if (createDateTime > orderCutoffTime)
+            {
+                // Created after last appointment slot (less buffer)
+                // Need to set Start Date to following Sunday
+                weekStartDate = weekStartDate.AddDays(7);
+            }
+
+            return weekStartDate;
+        }
     }
 }

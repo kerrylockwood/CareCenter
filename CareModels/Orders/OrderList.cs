@@ -15,7 +15,7 @@ namespace CareModels.Orders
         public int SlotId { get; set; }
 
         [Display(Name = "Date/Time")]
-        public string SlotDateTime { get; set; }
+        public DateTime SlotDateTime { get; set; }
 
         [Display(Name = "First Name")]
         public string CustFirstName { get; set; }
@@ -23,10 +23,15 @@ namespace CareModels.Orders
         [Display(Name = "Last Name")]
         public string CustLastName { get; set; }
 
+        [Display(Name = "Delivery")]
+        public bool Deliver { get; set; }
+
         [Display(Name = "Pull Started")]
         public bool PullStarted { get; set; }
 
         [Display(Name = "Pull Completed")]
         public bool PullCompleted { get; set; }
+
+        public DateTimeOffset CreateDateTime { get; set; }
     }
 }

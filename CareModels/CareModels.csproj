@@ -77,6 +77,11 @@
     <Compile Include="SubCategories\SubCatDetail.cs" />
     <Compile Include="SubCategories\SubCatList.cs" />
     <Compile Include="SubCategories\SubCatUpdate.cs" />
+    <Compile Include="TimeSlots\SlotCreate.cs" />
+    <Compile Include="TimeSlots\SlotDayOfWeek.cs" />
+    <Compile Include="TimeSlots\SlotDetail.cs" />
+    <Compile Include="TimeSlots\SlotList.cs" />
+    <Compile Include="TimeSlots\SlotUpdate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
