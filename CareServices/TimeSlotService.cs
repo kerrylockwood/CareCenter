@@ -62,6 +62,28 @@ namespace CareServices
             }
         }
 
+        public SlotDetail GetMaxTimeSlot()
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                        .TimeSlots
+                        .Where(e => e.SlotId > 0).OrderByDescending(x => x.DayOfWeekNum).ThenByDescending(x => x.Time).FirstOrDefault();
+                return
+                    new SlotDetail
+                    {
+                        SlotId = entity.SlotId,
+                        DayOfWeekNum = entity.DayOfWeekNum,
+                        DayOfWeekStr = ((DayOfWeek)entity.DayOfWeekNum).ToString(),
+                        Time = entity.Time,
+                        MaxPerSlot = entity.MaxPerSlot,
+                        CreateAt = entity.CreateAt,
+                        CreateName = entity.User.UserName
+                    };
+            }
+        }
+
         public bool CreateTimeSlot(SlotCreate model)
         {
             var entity =

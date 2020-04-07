@@ -82,6 +82,28 @@ namespace CareServices
             }
         }
 
+        public IEnumerable<SubCatListShort> GetSubCatsByCatId(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var query =
+                    ctx
+                        .SubCategories
+                        .OrderBy(e => e.SubCatName)
+                        .Where(e => e.CategoryId == id)
+                        .Select(
+                            e =>
+                                new SubCatListShort
+                                {
+                                    SubCatId = e.SubCatId,
+                                    SubCatName = e.SubCatName,
+                                    SubCatMaxAllowed = e.SubCatMaxAllowed,
+                                });
+
+                return query.ToArray();
+            }
+        }
+
         public bool CreateSubCat(SubCatCreate model)
         {
             var entity =

@@ -1,4 +1,5 @@
-﻿using CareServices;
+﻿using CareModels.Orders;
+using CareServices;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,13 @@ namespace GraceCareCenterOrder.Controllers
         {
             var service = CreateOrderService();
             var model = service.GetOrders();
+
+            // Get the Appointment Date/Time for each Order
+            foreach (var item in model)
+            {
+                item.SlotDateTime = ConvertSlotToDateTime(item.SlotId, item.CreateDateTime.DateTime, item.Deliver);
+            }
+
             return View(model);
         }
 
@@ -87,14 +95,67 @@ namespace GraceCareCenterOrder.Controllers
         //    return View(model);
         //}
 
-        //// GET: Customer/Details
-        //public ActionResult Details(int id)
-        //{
-        //    var svc = CreateCustomerService();
-        //    var model = svc.GetCustById(id);
+        // GET: Customer/Details
+        public ActionResult Details(int id)
+        {
+            List<OrderDetailCategory> catDtlList = new List<OrderDetailCategory>();
 
-        //    return View(model);
-        //}
+            var userId = User.Identity.GetUserId();
+            var catService = new CategoryService(userId);
+
+            var newCategoryList = catService.GetCategories().OrderBy(o => o.CategoryName);
+            foreach (CareModels.Catagories.CategoryList cat in newCategoryList)
+            {
+                List<OrderDetailSubCat> subCatDtlList = new List<OrderDetailSubCat>();
+                var subCatService = new SubCatService(userId);
+
+                var newSubCatList = subCatService.GetSubCatsByCatId(cat.CategoryId);
+                foreach (CareModels.SubCategories.SubCatListShort subCat in newSubCatList)
+                {
+                    List<OrderDetailItem> itemDtl = new List<OrderDetailItem>();
+                    var itemService = new ItemService(userId);
+
+                    var newItemList = itemService.GetItemsBySubCatId(subCat.SubCatId);
+                    foreach (CareModels.Items.ItemListShort itm in newItemList)
+                    {
+                        OrderDetailItem itmDtl = new OrderDetailItem
+                        {
+                            ItemId = itm.ItemId,
+                            ItemName = itm.ItemName,
+                            IsleNumber = itm.IsleNumber,
+                            MaxAllowed = itm.MaxAllowed,
+                            PointCost = itm.PointCost
+                        };
+                        itemDtl.Add(itmDtl);
+                    }
+                    OrderDetailSubCat dtlSubCat = new OrderDetailSubCat
+                    {
+                        SubCatId = subCat.SubCatId,
+                        CategoryId = cat.CategoryId,
+                        SubCatName = subCat.SubCatName,
+                        SubCatMaxAllowed = subCat.SubCatMaxAllowed,
+                        OrderDetailItemList = itemDtl
+                    };
+                    subCatDtlList.Add(dtlSubCat);
+                }
+
+                OrderDetailCategory dtlCat = new OrderDetailCategory
+                {
+                    CategoryId = cat.CategoryId,
+                    CategoryName = cat.CategoryName,
+                    OrderDetailSubCatList = subCatDtlList
+                };
+                catDtlList.Add(dtlCat);
+            }
+
+            var OrderService = CreateOrderService();
+            var model = OrderService.GetOrderById(id);
+
+            model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, model.CreateDateTime.DateTime, model.Deliver);
+            model.OrderDetailCategoryList = catDtlList;
+
+            return View(model);
+        }
 
         //// GET: Customer/Update
         //public ActionResult Edit(int id)
@@ -191,6 +252,70 @@ namespace GraceCareCenterOrder.Controllers
             return service;
         }
 
+        // Get Slot Date/Time from Slot DayOfWeek
+        public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime, bool delivery)
+        {
+            var userId = User.Identity.GetUserId();
+            var timeSlotService = new TimeSlotService(userId);
+
+            var slotDetail = timeSlotService.GetTimeSlotById(slotId);
+
+            DateTime weekStartDate = GetWeekStartDate(createDateTime, delivery);
+
+            return weekStartDate.AddDays(slotDetail.DayOfWeekNum).Add(slotDetail.Time);
+        }
+
+        // Get Slot Date/Time from Slot DayOfWeek
+        public DateTime GetWeekStartDate(DateTime createDateTime, bool delivery)
+        {
+            // Gets Sunday's Date of the Week where Customers can next pick
+            //    up orders.  If the createDateTime is before the last time
+            //    slot available for pickup, this date will be the Sunday
+            //    before.  Otherwise it will be the Sunday after.
+            // createDateTime passed in will be the DateTime the order was
+            //    created for existing orders or the current DateTime for
+            //    new orders.
+            // Assumption: Customers can start creating orders on the
+            //    day after the last Pickup Slot day and Pickups start
+            //    as early as Sunday
+
+            // Get Last Slot Day and Time. This will be used to determine
+            //    if Sunday will be before or after the createDateTime passed in
+            var userId = User.Identity.GetUserId();
+            var timeSlotService = new TimeSlotService(userId);
+
+            var slotDetail = timeSlotService.GetMaxTimeSlot();
+            int lastSlotDayOfWeek = slotDetail.DayOfWeekNum;
+            TimeSpan lastSlotTime = slotDetail.Time;
+
+            // To get weekStartDate: 1) strip off time, 2) subtract the
+            //    number of days we are into the next week.
+            // Assumption (again): First day of week for pickup is Sunday
+            int createDayOfWeek = (int)createDateTime.DayOfWeek;
+            DateTime weekStartDate
+                = createDateTime.Date.AddDays(createDayOfWeek * -1);
+            DateTime orderCutoffTime = new DateTime();
+
+            // For Delivery, cutoff time is midnight yesterday.  Otherwise
+            //    it is 2 hours (randomly selected) ago.
+            if (delivery)
+            {
+                orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek);
+            }
+            else
+            {
+                orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek).Add(lastSlotTime).AddMinutes(-120);
+            }
+
+            if (createDateTime >= orderCutoffTime)
+            {
+                // Created after last appointment slot (less buffer)
+                // Need to set Start Date to following Sunday
+                weekStartDate = weekStartDate.AddDays(7);
+            }
+
+            return weekStartDate;
+        }
         //// Build BarCode Dropdown
         //private IOrderedEnumerable<SelectListItem> BuildBarCodeDropdown()
         //{

@@ -70,6 +70,31 @@ namespace CareServices
             }
         }
 
+        public IEnumerable<ItemListShort> GetItemsBySubCatId(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var query =
+                    ctx
+                        .Items
+                        //.OrderBy(e => e.ItemName)
+                        //.Where(e => e.SubCatId == id)
+                        .Select(
+                            e =>
+                                new ItemListShort
+                                {
+                                    ItemId = e.ItemId,
+                                    ItemName = e.ItemName,
+                                    IsleNumber = e.IsleNumber,
+                                    MaxAllowed = e.MaxAllowed,
+                                    PointCost = e.PointCost
+                                }
+                                );
+
+                return query.ToArray();
+            }
+        }
+
         public bool CreateItem(ItemCreate model)
         {
             var entity =
