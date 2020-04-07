@@ -58,6 +58,7 @@
     <Compile Include="CategoryService.cs" />
     <Compile Include="CustomerService.cs" />
     <Compile Include="ItemService.cs" />
+    <Compile Include="OrderDetailService.cs" />
     <Compile Include="OrderService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubCatService.cs" />

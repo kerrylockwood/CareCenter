@@ -22,7 +22,7 @@ namespace CareData
         public string ItemName { get; set; }
 
         [Required]
-        public int IsleNumber { get; set; }
+        public int AisleNumber { get; set; }
 
         [Required]
         public int MaxAllowed { get; set; }

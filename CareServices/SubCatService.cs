@@ -56,7 +56,7 @@ namespace CareServices
                                 }
                         );
 
-                return query.ToArray();
+                return query.OrderBy(o => o.CatSubCatName).ToArray();
             }
         }
 

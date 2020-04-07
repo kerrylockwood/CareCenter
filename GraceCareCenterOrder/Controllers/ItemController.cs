@@ -33,7 +33,7 @@ namespace GraceCareCenterOrder.Controllers
             var subCatService = new SubCatService(userId);
 
             var sortedCatSubCatList = new SelectList(subCatService.GetCatSubCats(), "SubCatId", "CatSubCatName");
-            var sortedCatagoryList = sortedCatSubCatList.OrderBy(o => o.Text);
+            var sortedCatagoryList = sortedCatSubCatList.OrderBy(o => o.Value);
 
             ViewBag.SubCatId = sortedCatSubCatList;
 
@@ -93,7 +93,7 @@ namespace GraceCareCenterOrder.Controllers
                     ItemId = detail.ItemId,
                     SubCatId = detail.SubCatId,
                     ItemName = detail.ItemName,
-                    IsleNumber = detail.IsleNumber,
+                    AisleNumber = detail.AisleNumber,
                     MaxAllowed = detail.MaxAllowed,
                     PointCost = detail.PointCost
                 };

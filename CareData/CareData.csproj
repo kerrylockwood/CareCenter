@@ -115,6 +115,14 @@
     <Compile Include="Migrations\202004031923225_ChgTimeSlot.Designer.cs">
       <DependentUpon>202004031923225_ChgTimeSlot.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004071244065_Mods.cs" />
+    <Compile Include="Migrations\202004071244065_Mods.Designer.cs">
+      <DependentUpon>202004071244065_Mods.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202004072018148_RenameField.cs" />
+    <Compile Include="Migrations\202004072018148_RenameField.Designer.cs">
+      <DependentUpon>202004072018148_RenameField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OrderDetail.cs" />
     <Compile Include="OrderHeader.cs" />
@@ -168,6 +176,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004031923225_ChgTimeSlot.resx">
       <DependentUpon>202004031923225_ChgTimeSlot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004071244065_Mods.resx">
+      <DependentUpon>202004071244065_Mods.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004072018148_RenameField.resx">
+      <DependentUpon>202004072018148_RenameField.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

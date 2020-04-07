@@ -34,7 +34,7 @@ namespace CareServices
                                     CategoryName = e.SubCategory.Category.CategoryName,
                                     SubCatName = e.SubCategory.SubCatName,
                                     ItemName = e.ItemName,
-                                    IsleNumber = e.IsleNumber,
+                                    AisleNumber = e.AisleNumber,
                                     MaxAllowed = e.MaxAllowed,
                                     PointCost = e.PointCost
                                 }
@@ -61,7 +61,7 @@ namespace CareServices
                         CategoryName = entity.SubCategory.Category.CategoryName,
                         SubCatName = entity.SubCategory.SubCatName,
                         ItemName = entity.ItemName,
-                        IsleNumber = entity.IsleNumber,
+                        AisleNumber = entity.AisleNumber,
                         MaxAllowed = entity.MaxAllowed,
                         PointCost = entity.PointCost,
                         CreateAt = entity.CreateAt,
@@ -77,15 +77,15 @@ namespace CareServices
                 var query =
                     ctx
                         .Items
-                        //.OrderBy(e => e.ItemName)
-                        //.Where(e => e.SubCatId == id)
+                        .OrderBy(e => e.ItemName)
+                        .Where(e => e.SubCatId == id)
                         .Select(
                             e =>
                                 new ItemListShort
                                 {
                                     ItemId = e.ItemId,
                                     ItemName = e.ItemName,
-                                    IsleNumber = e.IsleNumber,
+                                    AisleNumber = e.AisleNumber,
                                     MaxAllowed = e.MaxAllowed,
                                     PointCost = e.PointCost
                                 }
@@ -103,7 +103,7 @@ namespace CareServices
                     //ItemId = model.ItemId,
                     SubCatId = model.SubCatId,
                     ItemName = model.ItemName,
-                    IsleNumber = model.IsleNumber,
+                    AisleNumber = model.AisleNumber,
                     MaxAllowed = model.MaxAllowed,
                     PointCost = model.PointCost,
                     CreateBy = _userId,
@@ -126,7 +126,7 @@ namespace CareServices
                         .Single(e => e.ItemId == model.ItemId);
                 entity.SubCatId = model.SubCatId;
                 entity.ItemName = model.ItemName;
-                entity.IsleNumber = model.IsleNumber;
+                entity.AisleNumber = model.AisleNumber;
                 entity.MaxAllowed = model.MaxAllowed;
                 entity.PointCost = model.PointCost;
 

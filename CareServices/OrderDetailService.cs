@@ -1,6 +1,5 @@
 ﻿using CareData;
 using CareModels.Orders;
-using CareModels.TimeSlots;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,95 +8,79 @@ using System.Threading.Tasks;
 
 namespace CareServices
 {
-    public class OrderService
+    public class OrderDetailService
     {
         private readonly string _userId;
 
         public object User { get; private set; }
 
-        public OrderService(string userId)
+        public OrderDetailService(string userId)
         {
             _userId = userId;
         }
 
-        public IEnumerable<OrderList> GetOrders()
+        //public IEnumerable<OrderList> GetOrders()
+        //{
+        //    using (var ctx = new ApplicationDbContext())
+        //    {
+        //        var query =
+        //            ctx
+        //                .OrderHeaders
+        //                .Select(
+        //                    e =>
+        //                        new OrderList
+        //                        {
+        //                            OrderId = e.OrderId,
+        //                            CustId = e.CustId,
+        //                            SlotId = e.SlotId,
+        //                            CreateDateTime = e.CreatedAt,
+        //                            //SlotDateTime cannot be populated here due to LINQ
+        //                            CustFirstName = e.Customer.FirstName,
+        //                            CustLastName = e.Customer.LastName,
+        //                            Deliver = e.Deliver,
+        //                            PullStarted = (e.PullStartedAt == null) ? false : true,
+        //                            PullCompleted = (e.OrderCompletedAt == null) ? false : true
+        //                        }
+        //                );
+
+        //        return query.ToArray();
+        //    }
+        //}
+
+        public OrderDetailItem GetOrderDetailByOrderIdAndItemId(int orderId, int itemId)
         {
             using (var ctx = new ApplicationDbContext())
             {
-                var query =
-                    ctx
-                        .OrderHeaders
-                        .Select(
-                            e =>
-                                new OrderList
-                                {
-                                    OrderId = e.OrderId,
-                                    CustId = e.CustId,
-                                    SlotId = e.SlotId,
-                                    CreateDateTime = e.CreatedAt,
-                                    //SlotDateTime cannot be populated here due to LINQ
-                                    CustFirstName = e.Customer.FirstName,
-                                    CustLastName = e.Customer.LastName,
-                                    Deliver = e.Deliver,
-                                    PullStarted = (e.PullStartedAt == null) ? false : true,
-                                    PullCompleted = (e.OrderCompletedAt == null) ? false : true
-                                }
-                        );
-
-                return query.ToArray();
-            }
-        }
-
-        public OrderHeaderDetail GetOrderById(int id)
-        {
-            using (var ctx = new ApplicationDbContext())
-            {
-                ////List<JoinItemToOrderDetail> JoinModel = (from itm in ctx.Items
-                //List<OrderDetailItem> orderDetailItem = (from itm in ctx.Items
-                //                                join odrDtl in ctx.OrderDetails 
-                //                                on   itm.ItemId equals odrDtl.OrderDetailId
-                //                                into bd
-                //                                orderby itm.ItemName
-                //                                from odrDtl in bd.DefaultIfEmpty()
-                //                                where itm.ItemId == odrDtl.ItemId && odrDtl.OrderHeader.OrderId == id
-                //                                select new OrderDetailItem()
-                //                                { 
-                //                                    ItemId = itm.ItemId,
-                //                                    SubCatId = itm.SubCatId,
-                //                                    ItemName = itm.ItemName,
-                //                                    AisleNumber = itm.AisleNumber,
-                //                                    MaxAllowed = itm.MaxAllowed,
-                //                                    PointCost = itm.PointCost,
-                //                                    Quantity = odrDtl.Quantity
-                //                                }
-                //                                //{ Item = itm, OrderDetail = odrDtl }
-                //               ).ToList();
-
+                if (ctx.OrderDetails.Count(e => e.OrderId == orderId && e.ItemId == itemId)
+                    == 0)
+                {
+                    return
+                    new OrderDetailItem
+                    {
+                        ItemId = 0,
+                        SubCatId = 0,
+                        ItemName = null,
+                        AisleNumber = 0,
+                        MaxAllowed = 0,
+                        PointCost = 0.0,
+                        Quantity = 0
+                    };
+                }
                 var entity =
                     ctx
-                        .OrderHeaders
-                        .Single(e => e.OrderId == id);
-                //var orderHeaderDetail =
+                        .OrderDetails
+                        .Single(e => e.OrderId == orderId && e.ItemId == itemId);
                 return
-                new OrderHeaderDetail
-                {
-                    OrderId = entity.OrderId,
-                    CustId = entity.CustId,
-                    SlotId = entity.TimeSlot.SlotId,
-                    SlotDateTime = new DateTime(),
-                    CustFirstName = entity.Customer.FirstName,
-                    CustLastName = entity.Customer.LastName,
-                    Deliver = entity.Deliver,
-                    PullStartedAt = entity.PullStartedAt,
-                    PullStartedBy = entity.PullStartedBy,
-                    PullStartedName = (entity.PullStartedBy == null) ? null : entity.PullStartedUser.UserName,
-                    OrderCompletedAt = entity.OrderCompletedAt,
-                    CreateDateTime = entity.CreatedAt,
-                    CreateName = entity.User.UserName,
-                    OrderDetailCategoryList = new List<OrderDetailCategory>() 
-                };
-
-                //return orderHeaderDetail;
+                    new OrderDetailItem
+                    {
+                        ItemId = entity.ItemId,
+                        SubCatId = entity.Item.SubCatId,
+                        ItemName = entity.Item.ItemName,
+                        AisleNumber = entity.Item.AisleNumber,
+                        MaxAllowed = entity.Item.MaxAllowed,
+                        PointCost = entity.Item.PointCost,
+                        Quantity = entity.Quantity
+                    };
             }
         }
 

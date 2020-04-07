@@ -23,7 +23,7 @@ namespace CareData.Migrations
                         ItemId = c.Int(nullable: false, identity: true),
                         SubCatId = c.Int(nullable: false),
                         ItemName = c.String(nullable: false),
-                        IsleNumber = c.Int(nullable: false),
+                        AisleNumber = c.Int(nullable: false),
                         MaxAllowed = c.Int(nullable: false),
                         PointCost = c.Int(nullable: false),
                     })

@@ -118,13 +118,19 @@ namespace GraceCareCenterOrder.Controllers
                     var newItemList = itemService.GetItemsBySubCatId(subCat.SubCatId);
                     foreach (CareModels.Items.ItemListShort itm in newItemList)
                     {
+                        //OrderDetailItem snglItemDtl = new OrderDetailItem();
+                        var orderDetailService = new OrderDetailService(userId);
+
+                        var newItemDtl = orderDetailService.GetOrderDetailByOrderIdAndItemId(id, itm.ItemId);
+
                         OrderDetailItem itmDtl = new OrderDetailItem
                         {
                             ItemId = itm.ItemId,
                             ItemName = itm.ItemName,
-                            IsleNumber = itm.IsleNumber,
+                            AisleNumber = itm.AisleNumber,
                             MaxAllowed = itm.MaxAllowed,
-                            PointCost = itm.PointCost
+                            PointCost = itm.PointCost,
+                            Quantity = newItemDtl.Quantity
                         };
                         itemDtl.Add(itmDtl);
                     }

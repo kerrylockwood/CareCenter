@@ -24,8 +24,8 @@ namespace CareModels.Items
         public string ItemName { get; set; }
 
         [Required]
-        [Display(Name = "Isle Number")]
-        public int IsleNumber { get; set; }
+        [Display(Name = "Aisle Number")]
+        public int AisleNumber { get; set; }
 
         [Required]
         [Display(Name = "Maximum Quantity of Item")]
