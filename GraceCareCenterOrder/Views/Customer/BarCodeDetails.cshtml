@@ -4,7 +4,7 @@
     ViewBag.Title = "BarCodeDetails";
 }
 
-<h2>BarCodeDetails</h2>
+<h2>BarCode Details</h2>
 
 
 @using (Html.BeginForm())
@@ -12,7 +12,7 @@
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>CustBarCode</h4>
+        <h4>Customer BarCode</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.BarCodeId)

@@ -12,6 +12,7 @@ namespace CareModels.SubCategories
     public class SubCatCreate
     {
         [Required]
+        [Display(Name = "Category")]
         public int CategoryId { get; set; }
         [ForeignKey(nameof(CategoryId))]
         public virtual Category Category { get; set; }

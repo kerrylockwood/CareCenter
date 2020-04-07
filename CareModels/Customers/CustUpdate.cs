@@ -47,7 +47,7 @@ namespace CareModels.Customers
         public string State { get; set; }
 
         [Required]
-        [Display(Name = "Last Name")]
+        [Display(Name = "ZIP Code")]
         [Range(0, 99999, ErrorMessage = "Please enter a Valid ZIP Code")]
         public int ZipCode { get; set; }
 

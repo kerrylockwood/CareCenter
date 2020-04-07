@@ -19,7 +19,7 @@ namespace CareModels.Items
         [Display(Name = "Category")]
         public string CategoryName { get; set; }
 
-        [Display(Name = "SubCategory")]
+        [Display(Name = "Sub-Category")]
         public string SubCatName { get; set; }
 
         [Display(Name = "Item")]

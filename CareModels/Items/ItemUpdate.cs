@@ -14,6 +14,7 @@ namespace CareModels.Items
         [Key]
         public int ItemId { get; set; }
 
+        [Display(Name = "Sub-Category")]
         public int SubCatId { get; set; }
         [ForeignKey(nameof(SubCatId))]
         public virtual SubCategory SubCategory { get; set; }

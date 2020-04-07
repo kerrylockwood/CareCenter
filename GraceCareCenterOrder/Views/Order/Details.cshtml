@@ -4,27 +4,15 @@
     ViewBag.Title = "Details";
 }
 
-<h2>Details</h2>
+    <h2>Orders</h2>
 
 <div>
-    <h4>OrderHeaderDetail</h4>
+    <h4>Order Detail</h4>
     <hr />
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.CustId)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.CustId)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.SlotId)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.SlotId)
-        </dd>
+            @Html.HiddenFor(model => model.OrderId)
+            @Html.HiddenFor(model => model.CustId)
+            @Html.HiddenFor(model => model.SlotId)
 
         <dt>
             @Html.DisplayNameFor(model => model.SlotDateTime)

@@ -14,7 +14,7 @@ namespace CareModels.Orders
         public int CustId { get; set; }
         public int SlotId { get; set; }
 
-        [Display(Name = "Date/Time")]
+        [Display(Name = "Pickup Date/Time")]
         public DateTime? SlotDateTime { get; set; }
 
         [Display(Name = "First Name")]
