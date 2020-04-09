@@ -13,8 +13,7 @@ namespace CareData
         [Key]
         public int CustomerId { get; set; }
 
-        [Required]
-        public int BarCodeId { get; set; }
+        public int? BarCodeId { get; set; }
         [ForeignKey(nameof(BarCodeId))]
         public virtual BarCode BarCode { get; set; }
 

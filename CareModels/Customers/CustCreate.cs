@@ -13,6 +13,7 @@ namespace CareModels.Customers
     {
         [Key]
         public int CustomerId { get; set; }
+        public bool IsOrder { get; set; }
 
         [Display(Name = "Bar Code (Select or start typing)")]
         [Required]

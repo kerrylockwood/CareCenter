@@ -13,9 +13,10 @@ namespace CareModels.Customers
     {
         [Key]
         public int CustomerId { get; set; }
+        public bool IsOrder { get; set; }
 
         [Display(Name = "Bar Code")]
-        public int BarCodeId { get; set; }
+        public int? BarCodeId { get; set; }
         [ForeignKey(nameof(BarCodeId))]
         public virtual BarCode BarCode { get; set; }
 

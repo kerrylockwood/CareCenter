@@ -1,4 +1,6 @@
-﻿using CareModels.Customers;
+﻿using CareData;
+using CareModels.BarCodes;
+using CareModels.Customers;
 using CareServices;
 using Microsoft.AspNet.Identity;
 using System;
@@ -20,42 +22,88 @@ namespace GraceCareCenterOrder.Controllers
             return View(model);
         }
 
-        //Move to OrderCreate - begin
-        // GET: Customer/BarCode
-        public ActionResult BarCodeDetails()
-        {
-            return View();
-        }
+        ////Move to OrderCreate - begin
+        //// GET: Customer/BarCode
+        //public ActionResult BarCodeDetails()
+        //{
+        //    return View();
+        //}
 
-        // POST: Customer/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult BarCodeValidate(CustBarCode model)
-        {
-            if (!ModelState.IsValid) return View(model);
+        //// POST: Customer/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult BarCodeValidate(CustBarCode model)
+        //{
+        //    if (!ModelState.IsValid) return View(model);
 
-            var service = CreateCustomerService();
+        //    var service = CreateCustomerService();
 
-            if (service.ValidateCustBarCode(model.BarCodeNumber) == null && model.BarCodeNumber > 0)
-            {
-                ModelState.AddModelError("", $"'{model.BarCodeNumber}' is not a valid Bar Code Number.  Please re-enter or contact a member of the Food Pantry team.");
+        //    if (service.ValidateCustBarCode(model.BarCodeNumber) == null && model.BarCodeNumber > 0)
+        //    {
+        //        ModelState.AddModelError("", $"'{model.BarCodeNumber}' is not a valid Bar Code Number.  Please re-enter or contact a member of the Food Pantry team.");
 
-                return View(model);
-            };
+        //        return View(model);
+        //    };
 
-            TempData["BarCodeId"] = model.BarCodeId;
-            TempData["BarCodeNumber"] = model.BarCodeNumber;
-            return RedirectToAction("Create");
-        }
-        //Move to OrderCreate - end
+        //    TempData["BarCodeId"] = model.BarCodeId;
+        //    TempData["BarCodeNumber"] = model.BarCodeNumber;
+        //    return RedirectToAction("Create");
+        //}
+        ////Move to OrderCreate - end
 
         // Get: Customer/Create
-        public ActionResult Create()
+        public ActionResult Create(bool isOrder, int barCodeId)
         {
+            var userId = User.Identity.GetUserId();
+            var barCodeService = new BarCodeService(userId);
+
+            BarCode barCodeData = new BarCode();
+            //if (barCodeId == 0)
+            //{
+            //    barCodeData.BarCodeId = 0;
+            //    barCodeData.BarCodeNumber = 0;
+            //    // dummy data - don't need:
+            //    barCodeData.CreateAt = DateTimeOffset.Now;
+            //    barCodeData.CreateBy = "XX";
+            //}
+            if (barCodeId != 0)
+            {
+                BarCodeDetail barCodeDetail = barCodeService.GetBarCodeById(barCodeId);
+                barCodeData.BarCodeId = barCodeDetail.BarCodeId;
+                barCodeData.BarCodeNumber = barCodeDetail.BarCodeNumber;
+                // dummy data - don't need:
+                barCodeData.CreateAt = DateTimeOffset.Now;
+                barCodeData.CreateBy = "XX";
+            }
+
+            CustCreate model = new CustCreate
+            {
+                CustomerId = 0,
+                IsOrder = isOrder,
+                BarCodeId = barCodeData.BarCodeId,
+                BarCode = barCodeData,
+                FirstName = null,
+                LastName = null,
+                Address = null,
+                City = null,
+                State = null,
+                ZipCode = 0,
+                Phone = null,
+                Email = null,
+                NumberKids = 0
+            };
+            //ViewBag.BarCodeData = barCodeData;
             ViewBag.BarCodeId = BuildBarCodeDropdown(0);
 
-            return View();
+            return View(model);
         }
+
+        //public ActionResult Create()
+        //{
+        //    ViewBag.BarCodeId = BuildBarCodeDropdown(0);
+
+        //    return View();
+        //}
 
         // POST: Customer/Create
         [HttpPost]
@@ -66,17 +114,50 @@ namespace GraceCareCenterOrder.Controllers
 
             var service = CreateCustomerService();
 
-            CustDetail existingCustDetail = service.GetCustByBarCodeId(model.BarCodeId);
-            if (existingCustDetail != null)
+            if (model.BarCodeId == 0)
             {
-                ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
+                if (model.IsOrder)
+                {
+                    // when creating an order, BarCode can be 0
+                    if (service.CreateCust(model))
+                    {
+                        TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was created";
+                        // Order cannot exist - must create it
+                        return RedirectToAction("=====Order Create - need to send Cust data=====");
+                    };
+                }
+                else
+                {
+                    // Creating a New Customer
+                    ModelState.AddModelError("", $"BarCode cannot be 0.");
 
-                ViewBag.BarCodeId = BuildBarCodeDropdown(0);
+                    ViewBag.BarCodeId = BuildBarCodeDropdown(0);
 
-                return View(model);
+                    return View(model);
+                }
             }
+
+            CustDetail existingCustDetail = service.GetCustByBarCodeId(model.BarCodeId);
+
+            if (!model.IsOrder)
+            {
+                // This is NOT an order, must validate that Barcode does not exist
+                if (existingCustDetail != null)
+                {
+                    ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
+
+                    ViewBag.BarCodeId = BuildBarCodeDropdown(0);
+
+                    return View(model);
+                }
+            }
+
             if (service.CreateCust(model))
             {
+                if (model.IsOrder)
+                {
+                    return RedirectToAction("=====Order Create - need to send Cust data=====");
+                }
                 TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was created";
                 return RedirectToAction("Index");
             };
@@ -98,7 +179,7 @@ namespace GraceCareCenterOrder.Controllers
         }
 
         // GET: Customer/Update
-        public ActionResult Edit(int id)
+        public ActionResult Edit(bool isOrder, int id)
         {
             var service = CreateCustomerService();
             var detail = service.GetCustById(id);
@@ -106,6 +187,7 @@ namespace GraceCareCenterOrder.Controllers
                 new CustUpdate
                 {
                     CustomerId = detail.CustomerId,
+                    IsOrder = isOrder,
                     BarCodeId = detail.BarCodeId,
                     FirstName = detail.FirstName,
                     LastName = detail.LastName,
@@ -117,8 +199,8 @@ namespace GraceCareCenterOrder.Controllers
                     Email = detail.Email,
                     NumberKids = detail.NumberKids
                 };
-
-            ViewBag.BarCodeId = BuildBarCodeDropdown(detail.BarCodeId);
+            
+            ViewBag.BarCodeId = BuildBarCodeDropdown((int)detail.BarCodeId);
 
             return View(model);
         }
@@ -138,24 +220,28 @@ namespace GraceCareCenterOrder.Controllers
 
             var service = CreateCustomerService();
 
-            CustDetail existingCustDetail = service.GetCustByBarCodeId(model.BarCodeId);
+            CustDetail existingCustDetail = service.GetCustByBarCodeId((int)model.BarCodeId);
             if (existingCustDetail != null && existingCustDetail.CustomerId != id)
             {
                 ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
 
-                ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
+                ViewBag.BarCodeId = BuildBarCodeDropdown((int)model.BarCodeId);
 
                 return View(model);
             }
             if (service.UpdateCust(model))
             {
+                if (model.IsOrder)
+                {
+                    return RedirectToAction("=====Order Create - need to send Cust data=====");
+                }
                 TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was updated.";
                 return RedirectToAction("Index");
             }
 
             ModelState.AddModelError("", $"'{model.FirstName} {model.LastName}' could not be updated.");
 
-            ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
+            ViewBag.BarCodeId = BuildBarCodeDropdown((int)model.BarCodeId);
 
             return View(model);
         }

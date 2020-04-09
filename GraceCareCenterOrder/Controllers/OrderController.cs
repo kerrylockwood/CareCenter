@@ -1,4 +1,5 @@
-﻿using CareModels.Orders;
+﻿using CareModels.BarCodes;
+using CareModels.Orders;
 using CareServices;
 using Microsoft.AspNet.Identity;
 using System;
@@ -27,34 +28,53 @@ namespace GraceCareCenterOrder.Controllers
             return View(model);
         }
 
-        ////Move to OrderCreate - begin
-        //// GET: Customer/BarCode
-        //public ActionResult BarCodeDetails()
-        //{
-        //    return View();
-        //}
+        // OrderCreate Stream - Starts here
+        // GET: Customer/BarCode
+        public ActionResult GetCustBarCode(bool isCust)
+        {
+            OrderGetCustBarCode model = new OrderGetCustBarCode();
+            model.BarCodeNumber = -1;
+            model.IsCust = isCust;
+            return View(model);
+        }
 
-        //// POST: Customer/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult BarCodeValidate(CustBarCode model)
-        //{
-        //    if (!ModelState.IsValid) return View(model);
+        // POST: Customer/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult GetCustBarCode(OrderGetCustBarCode model)
+        {
+            if (!ModelState.IsValid) return View(model);
 
-        //    var service = CreateCustomerService();
+            if (model.BarCodeNumber > 0)
+            {
+                var userId = User.Identity.GetUserId();
+                var BarCodeService = new BarCodeService(userId);
 
-        //    if (service.ValidateCustBarCode(model.BarCodeNumber) == null && model.BarCodeNumber > 0)
-        //    {
-        //        ModelState.AddModelError("", $"'{model.BarCodeNumber}' is not a valid Bar Code Number.  Please re-enter or contact a member of the Food Pantry team.");
+                BarCodeDetail newBarCodeDetail = BarCodeService.GetBarCodeByBarCode(model.BarCodeNumber);
+                if (newBarCodeDetail == null)
+                {
+                    ModelState.AddModelError("", $"'{model.BarCodeNumber}' is not a valid Bar Code Number.  Please re-enter or contact a member of the Food Pantry team.");
 
-        //        return View(model);
-        //    };
+                    return View(model);
+                };
 
-        //    TempData["BarCodeId"] = model.BarCodeId;
-        //    TempData["BarCodeNumber"] = model.BarCodeNumber;
-        //    return RedirectToAction("Create");
-        //}
-        ////Move to OrderCreate - end
+                // Update Customer
+                TempData["BarCodeId"] = newBarCodeDetail.BarCodeId;
+                TempData["BarCodeNumber"] = model.BarCodeNumber;
+                return RedirectToAction("Create");
+            }
+            else
+            {
+                // Create Customer
+                //TempData["BarCodeId"] = 0;
+                //TempData["BarCodeNumber"] = model.BarCodeNumber;
+
+                return RedirectToAction(actionName: "Create", controllerName: "Customer", routeValues: new { isOrder = true, barCodeId = 0 });
+
+                //@Html.ActionLink(linkText: "Create Order", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isOrder = true }, htmlAttributes: new { @class = "btn btn-primary btn-large" })
+            }
+        }
+        //Move to OrderCreate - end
 
         //// Get: Customer/Create
         //public ActionResult Create()

@@ -71,6 +71,7 @@
     <Compile Include="Items\ItemList.cs" />
     <Compile Include="Items\ItemListShort.cs" />
     <Compile Include="Items\ItemUpdate.cs" />
+    <Compile Include="Orders\OrderGetCustBarCode.cs" />
     <Compile Include="Orders\JoinItemToOrderDetail.cs" />
     <Compile Include="Orders\OrderHeaderDetail.cs" />
     <Compile Include="Orders\OrderDetailCategory.cs" />

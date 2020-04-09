@@ -7,7 +7,8 @@
 <h2>Pantry Customers</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink(linkText: "Create New", actionName: "Create", routeValues: new { isOrder = false, barCodeId = 0 })
+    @*@Html.ActionLink(linkText: "Create Order", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true }, htmlAttributes: new { @class = "btn btn-primary btn-large" })*@
 </p>
 @if (TempData.ContainsKey("SaveResult"))
 {
@@ -70,7 +71,7 @@
                 @Html.DisplayFor(modelItem => item.Phone)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.CustomerId }) |
+                @Html.ActionLink("Edit", "Edit", new { isOrder = false, id = item.CustomerId }) |
                 @Html.ActionLink("Details", "Details", new { id = item.CustomerId }) |
                 @Html.ActionLink("Delete", "Delete", new { id = item.CustomerId })
             </td>

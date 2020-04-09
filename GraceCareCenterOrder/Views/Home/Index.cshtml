@@ -6,7 +6,7 @@
     <h1>Grace Care Center Food Pantry</h1>
     <p class="lead">Start here to create a food pantry order.</p>
     <p>
-        @Html.ActionLink("Create Order", "BarCodeDetails", "Customer", null, new { @class = "btn btn-primary btn-large" })
+        @Html.ActionLink(linkText: "Create Order", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new {isCust = true}, htmlAttributes: new { @class = "btn btn-primary btn-large" })
     </p>
 </div>
 

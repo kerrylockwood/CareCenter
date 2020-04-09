@@ -131,7 +131,7 @@ namespace CareServices
             var entity =
                 new Customer()
                 {
-                    BarCodeId = model.BarCodeId,
+                    //BarCodeId = model.BarCodeId,  // this must be null if BarCode is 0
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Address = model.Address,
@@ -144,6 +144,10 @@ namespace CareServices
                     CreateBy = _userId,
                     CreateAt = DateTimeOffset.Now
                 };
+            if (model.BarCodeId != 0)
+            {
+                entity.BarCodeId = model.BarCodeId;
+            }
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.Customers.Add(entity);

@@ -4,13 +4,13 @@
     ViewBag.Title = "Edit";
 }
 
-    <h2>Customers</h2>
+<h2>Customers</h2>
 
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Customer Update</h4>
         <hr />
@@ -105,9 +105,22 @@
     </div>
 }
 
+@if (Model.IsOrder)
+{
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink(linkText: "Back to BarCode Entry", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true }, htmlAttributes: new { })
+    @*@Html.ActionLink(linkText: "Back to BarCode Entry", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true })*@
+    @*@Html.ActionLink(linkText: "Create New", actionName: "Create", routeValues: new { isOrder = false, barCodeId = 0 })*@
+    @*@Html.ActionLink(linkText: "Create Order", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true }, htmlAttributes: new { @class = "btn btn-primary btn-large" })*@
 </div>
+}
+
+@if (!Model.IsOrder)
+{
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+}
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

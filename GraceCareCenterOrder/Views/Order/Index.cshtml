@@ -7,7 +7,8 @@
 <h2>Pantry Orders</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink(linkText: "Create New", actionName: "GetCustBarCode", routeValues: new { isCust = false })
+    @*@Html.ActionLink(linkText: "Create Order", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true }, htmlAttributes: new { @class = "btn btn-primary btn-large" })*@
 </p>
 <table class="table">
     <tr>

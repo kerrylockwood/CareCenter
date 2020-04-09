@@ -52,32 +52,10 @@ namespace CareServices
         {
             using (var ctx = new ApplicationDbContext())
             {
-                ////List<JoinItemToOrderDetail> JoinModel = (from itm in ctx.Items
-                //List<OrderDetailItem> orderDetailItem = (from itm in ctx.Items
-                //                                join odrDtl in ctx.OrderDetails 
-                //                                on   itm.ItemId equals odrDtl.OrderDetailId
-                //                                into bd
-                //                                orderby itm.ItemName
-                //                                from odrDtl in bd.DefaultIfEmpty()
-                //                                where itm.ItemId == odrDtl.ItemId && odrDtl.OrderHeader.OrderId == id
-                //                                select new OrderDetailItem()
-                //                                { 
-                //                                    ItemId = itm.ItemId,
-                //                                    SubCatId = itm.SubCatId,
-                //                                    ItemName = itm.ItemName,
-                //                                    AisleNumber = itm.AisleNumber,
-                //                                    MaxAllowed = itm.MaxAllowed,
-                //                                    PointCost = itm.PointCost,
-                //                                    Quantity = odrDtl.Quantity
-                //                                }
-                //                                //{ Item = itm, OrderDetail = odrDtl }
-                //               ).ToList();
-
                 var entity =
                     ctx
                         .OrderHeaders
                         .Single(e => e.OrderId == id);
-                //var orderHeaderDetail =
                 return
                 new OrderHeaderDetail
                 {
@@ -96,10 +74,37 @@ namespace CareServices
                     CreateName = entity.User.UserName,
                     OrderDetailCategoryList = new List<OrderDetailCategory>() 
                 };
-
-                //return orderHeaderDetail;
             }
         }
+
+        ////Move to OrderCreate - begin
+        //// GET: Customer/BarCode
+        //public ActionResult BarCodeDetails()
+        //{
+        //    return View();
+        //}
+
+        //// POST: Customer/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult BarCodeValidate(CustBarCode model)
+        //{
+        //    if (!ModelState.IsValid) return View(model);
+
+        //    var service = CreateCustomerService();
+
+        //    if (service.ValidateCustBarCode(model.BarCodeNumber) == null && model.BarCodeNumber > 0)
+        //    {
+        //        ModelState.AddModelError("", $"'{model.BarCodeNumber}' is not a valid Bar Code Number.  Please re-enter or contact a member of the Food Pantry team.");
+
+        //        return View(model);
+        //    };
+
+        //    TempData["BarCodeId"] = model.BarCodeId;
+        //    TempData["BarCodeNumber"] = model.BarCodeNumber;
+        //    return RedirectToAction("Create");
+        //}
+        ////Move to OrderCreate - end
 
         //public bool CreateItem(ItemCreate model)
         //{

@@ -17,7 +17,7 @@ namespace CareModels.BarCodes
 
         [Display(Name = "Created At")]
         // Formatting set in GraceCAreCenterOrder/Views/Shared/DisplayTemplates
-        public DateTimeOffset CreateAt { get; set; }
+        public DateTimeOffset? CreateAt { get; set; }
 
         [Display(Name = "Created By")]
         public String CreateName { get; set; }

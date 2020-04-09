@@ -12,7 +12,7 @@ namespace CareModels.Customers
         [Key]
         public int CustomerId { get; set; }
 
-        public int BarCodeId { get; set; }
+        public int? BarCodeId { get; set; }
 
         [Display(Name = "Bar Code")]
         public int BarCodeNumber { get; set; }

@@ -72,6 +72,37 @@ namespace CareServices
             }
         }
 
+        public BarCodeDetail GetBarCodeByBarCode(int barCodeNum)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                if (ctx.BarCodes.Count(e => e.BarCodeNumber == barCodeNum)
+                    == 0)
+                {
+                    return
+                    new BarCodeDetail
+                    {
+                        BarCodeId = 0,
+                        BarCodeNumber = 0,
+                        CreateAt = null,
+                        CreateName = null
+                    };
+                }
+                var entity =
+                    ctx
+                        .BarCodes
+                        .Single(e => e.BarCodeNumber == barCodeNum);
+                return
+                    new BarCodeDetail
+                    {
+                        BarCodeId = entity.BarCodeId,
+                        BarCodeNumber = entity.BarCodeNumber,
+                        CreateAt = entity.CreateAt,
+                        CreateName = entity.User.UserName
+                    };
+            }
+        }
+
         public bool DeleteBarCode(int barCodeId)
         {
             using (var ctx = new ApplicationDbContext())
