@@ -99,7 +99,7 @@ namespace CareServices
             {
                 if (ctx.Customers.Count(e => e.BarCodeId == id) == 0)
                 {
-                    return null;
+                    return new CustDetail();
                 }
                 var entity =
                     ctx
@@ -126,7 +126,7 @@ namespace CareServices
             }
         }
 
-        public bool CreateCust(CustCreate model)
+        public int CreateCust(CustCreate model)
         {
             var entity =
                 new Customer()
@@ -151,7 +151,9 @@ namespace CareServices
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.Customers.Add(entity);
-                return ctx.SaveChanges() == 1;
+                ctx.SaveChanges();
+                var id = entity.CustomerId;
+                return id;
             }
         }
 
@@ -174,7 +176,12 @@ namespace CareServices
                 entity.Email = model.Email;
                 entity.NumberKids = model.NumberKids;
 
-                return ctx.SaveChanges() == 1;
+                bool rtnBool = true;
+
+                try { ctx.SaveChanges(); }
+                catch { rtnBool = false; }
+
+                return rtnBool;
             }
         }
 

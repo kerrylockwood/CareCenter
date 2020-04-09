@@ -58,14 +58,6 @@ namespace GraceCareCenterOrder.Controllers
             var barCodeService = new BarCodeService(userId);
 
             BarCode barCodeData = new BarCode();
-            //if (barCodeId == 0)
-            //{
-            //    barCodeData.BarCodeId = 0;
-            //    barCodeData.BarCodeNumber = 0;
-            //    // dummy data - don't need:
-            //    barCodeData.CreateAt = DateTimeOffset.Now;
-            //    barCodeData.CreateBy = "XX";
-            //}
             if (barCodeId != 0)
             {
                 BarCodeDetail barCodeDetail = barCodeService.GetBarCodeById(barCodeId);
@@ -92,7 +84,7 @@ namespace GraceCareCenterOrder.Controllers
                 Email = null,
                 NumberKids = 0
             };
-            //ViewBag.BarCodeData = barCodeData;
+
             ViewBag.BarCodeId = BuildBarCodeDropdown(0);
 
             return View(model);
@@ -110,6 +102,7 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CustCreate model)
         {
+            int newCustId = 0;
             if (!ModelState.IsValid) return View(model);
 
             var service = CreateCustomerService();
@@ -119,11 +112,11 @@ namespace GraceCareCenterOrder.Controllers
                 if (model.IsOrder)
                 {
                     // when creating an order, BarCode can be 0
-                    if (service.CreateCust(model))
+                    newCustId = service.CreateCust(model);
+                    if (newCustId > 0)
                     {
-                        TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was created";
                         // Order cannot exist - must create it
-                        return RedirectToAction("=====Order Create - need to send Cust data=====");
+                        return RedirectToAction(actionName: "Create", controllerName: "Order", routeValues: new { CustId = newCustId });
                     };
                 }
                 else
@@ -152,11 +145,12 @@ namespace GraceCareCenterOrder.Controllers
                 }
             }
 
-            if (service.CreateCust(model))
+            newCustId = service.CreateCust(model);
+            if (newCustId > 0)
             {
                 if (model.IsOrder)
                 {
-                    return RedirectToAction("=====Order Create - need to send Cust data=====");
+                    return RedirectToAction(actionName: "Create", controllerName: "Order", routeValues: new { CustId = newCustId });
                 }
                 TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was created";
                 return RedirectToAction("Index");
@@ -179,7 +173,7 @@ namespace GraceCareCenterOrder.Controllers
         }
 
         // GET: Customer/Update
-        public ActionResult Edit(bool isOrder, int id)
+        public ActionResult Edit(bool isCust, bool isOrder, int id)
         {
             var service = CreateCustomerService();
             var detail = service.GetCustById(id);
@@ -188,6 +182,8 @@ namespace GraceCareCenterOrder.Controllers
                 {
                     CustomerId = detail.CustomerId,
                     IsOrder = isOrder,
+                    IsCust = isCust,
+                    //BarCodeNumber = new BarCode(),
                     BarCodeId = detail.BarCodeId,
                     FirstName = detail.FirstName,
                     LastName = detail.LastName,
@@ -199,7 +195,14 @@ namespace GraceCareCenterOrder.Controllers
                     Email = detail.Email,
                     NumberKids = detail.NumberKids
                 };
-            
+            var userId = User.Identity.GetUserId();
+            var barCodeService = new BarCodeService(userId);
+
+            // BarCodeId cannot be null to get here
+            var barCodeDetail = barCodeService.GetBarCodeById((int)model.BarCodeId);
+
+            model.BarCodeNumber = barCodeDetail.BarCodeNumber;
+
             ViewBag.BarCodeId = BuildBarCodeDropdown((int)detail.BarCodeId);
 
             return View(model);
@@ -233,7 +236,22 @@ namespace GraceCareCenterOrder.Controllers
             {
                 if (model.IsOrder)
                 {
-                    return RedirectToAction("=====Order Create - need to send Cust data=====");
+                    var userId = User.Identity.GetUserId();
+                    var orderHeaderService = new OrderService(userId);
+
+                    var existingOrderHeader = orderHeaderService.GetOrderHeaderByCustId(id);
+                    if (existingOrderHeader.OrderId == 0)
+                    {
+                        // Order does not Exist
+                        return RedirectToAction(actionName: "Create", controllerName: "Order", routeValues: new { CustId = id, IsCust = model.IsOrder });
+                    }
+                    // Order Exists
+                    if (existingOrderHeader.PullStartedAt != null)
+                    {
+                        TempData["SaveResult"] = "We are assembling your order now. Your order can no longer be changed.";
+                        return RedirectToAction("Index", "Home");
+                    }
+                    return RedirectToAction("=====Order Update - need to send Cust data=====");
                 }
                 TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was updated.";
                 return RedirectToAction("Index");

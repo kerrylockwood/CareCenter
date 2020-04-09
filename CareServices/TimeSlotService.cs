@@ -40,6 +40,52 @@ namespace CareServices
             }
         }
 
+        public IEnumerable<TimeSelect> GetTimeSlotDropDown(bool delivery)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var query =
+                    ctx
+                        .TimeSlots
+                        .Select(
+                            e =>
+                                new SlotList
+                                {
+                                    SlotId = e.SlotId,
+                                    DayOfWeekNum = e.DayOfWeekNum,
+                                    DayOfWeekStr = ((DayOfWeek)e.DayOfWeekNum).ToString(),
+                                    Time = e.Time,
+                                    MaxPerSlot = e.MaxPerSlot,
+                                }
+                        );
+                var orderService = new OrderService(_userId);
+
+                List<TimeSelect> timeSelectList = new List<TimeSelect>();
+
+                foreach (SlotList slot in query)
+                {
+                    DateTime slotTime = orderService.ConvertSlotToDateTime(slot.SlotId, DateTime.Now, false, _userId);
+                    if (DateTime.Now.AddMinutes(120) < slotTime)
+                    {
+                        var lastTimeSlot = GetMaxTimeSlot();
+                        orderService.ConvertSlotToDateTime(lastTimeSlot.SlotId, DateTime.Now, delivery,_userId);
+                        int slotCount = orderService.GetSlotCount(slot.SlotId, false);
+                        if (slotCount < slot.MaxPerSlot)
+                        {
+                            TimeSelect timeSelect = new TimeSelect
+                            {
+                                SlotId = slot.SlotId,
+                                SlotTime = slotTime
+                            };
+                            timeSelectList.Add(timeSelect);
+                        }
+                    }
+                }
+
+                return timeSelectList.ToArray();
+            }
+        }
+
         public SlotDetail GetTimeSlotById(int id)
         {
             using (var ctx = new ApplicationDbContext())

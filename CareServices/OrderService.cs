@@ -48,6 +48,44 @@ namespace CareServices
             }
         }
 
+        public OrderHeaderDetail GetOrderHeaderByCustId(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                if (ctx.OrderHeaders.Count(e => e.CustId == id) == 0)
+                {
+                    return new OrderHeaderDetail();
+                }
+                var entity =
+                    ctx
+                        .OrderHeaders
+                        .Single(e => e.OrderId == id);
+                return
+                new OrderHeaderDetail
+                {
+                    OrderId = entity.OrderId,
+                    CustId = entity.CustId,
+                    SlotId = entity.TimeSlot.SlotId,
+                    SlotDateTime = new DateTime(),
+                    CustFirstName = entity.Customer.FirstName,
+                    CustLastName = entity.Customer.LastName,
+                    Deliver = entity.Deliver,
+                    PullStartedAt = entity.PullStartedAt,
+                    PullStartedBy = entity.PullStartedBy,
+                    PullStartedName = (entity.PullStartedBy == null) ? null : entity.PullStartedUser.UserName,
+                    OrderCompletedAt = entity.OrderCompletedAt,
+                    PullCompleted = (entity.OrderCompletedAt == null) ? false : true,
+                    MostWantedNotes = entity.MostWantedNotes,
+                    FreezerNotes = entity.FreezerNotes,
+                    ProduceNotes = entity.ProduceNotes,
+                    NonFoodNotes = entity.NonFoodNotes,
+                    CreateDateTime = entity.CreatedAt,
+                    CreateName = entity.User.UserName,
+                    OrderDetailCategoryList = new List<OrderDetailCategory>()
+                };
+            }
+        }
+
         public OrderHeaderDetail GetOrderById(int id)
         {
             using (var ctx = new ApplicationDbContext())
@@ -70,11 +108,157 @@ namespace CareServices
                     PullStartedBy = entity.PullStartedBy,
                     PullStartedName = (entity.PullStartedBy == null) ? null : entity.PullStartedUser.UserName,
                     OrderCompletedAt = entity.OrderCompletedAt,
+                    PullCompleted = (entity.OrderCompletedAt == null) ? false : true,
+                    MostWantedNotes = entity.MostWantedNotes,
+                    FreezerNotes = entity.FreezerNotes,
+                    ProduceNotes = entity.ProduceNotes,
+                    NonFoodNotes = entity.NonFoodNotes,
                     CreateDateTime = entity.CreatedAt,
                     CreateName = entity.User.UserName,
-                    OrderDetailCategoryList = new List<OrderDetailCategory>() 
+                    OrderDetailCategoryList = new List<OrderDetailCategory>()
                 };
             }
+        }
+
+        public int GetSlotCount(int slotId, bool delivery)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var timeSlotService = new TimeSlotService(_userId);
+
+                var lastTimeSlot = timeSlotService.GetMaxTimeSlot();
+                DateTimeOffset excludeCreateBefore = ConvertSlotToDateTime(lastTimeSlot.SlotId, DateTime.Now, delivery, _userId);
+
+                int cnt = ctx.OrderHeaders.Count(e => e.SlotId == slotId && e.Deliver == delivery && e.CreatedAt > excludeCreateBefore);
+                {
+                    return cnt;
+                }
+            }
+        }
+
+        public OrderHeaderDetail GetOrderWithDetailById(int id, string userId)
+        {
+            //List<OrderDetailCategory> catDtlList = new List<OrderDetailCategory>();
+
+            //var catService = new CategoryService(userId);
+
+            //var newCategoryList = catService.GetCategories().OrderBy(o => o.CategoryName);
+            //foreach (CareModels.Catagories.CategoryList cat in newCategoryList)
+            //{
+            //    List<OrderDetailSubCat> subCatDtlList = new List<OrderDetailSubCat>();
+            //    var subCatService = new SubCatService(userId);
+
+            //    var newSubCatList = subCatService.GetSubCatsByCatId(cat.CategoryId);
+            //    foreach (CareModels.SubCategories.SubCatListShort subCat in newSubCatList)
+            //    {
+            //        List<OrderDetailItem> itemDtl = new List<OrderDetailItem>();
+            //        var itemService = new ItemService(userId);
+
+            //        var newItemList = itemService.GetItemsBySubCatId(subCat.SubCatId);
+            //        foreach (CareModels.Items.ItemListShort itm in newItemList)
+            //        {
+            //            //OrderDetailItem snglItemDtl = new OrderDetailItem();
+            //            var orderDetailService = new OrderDetailService(userId);
+
+            //            var newItemDtl = orderDetailService.GetOrderDetailByOrderIdAndItemId(id, itm.ItemId);
+
+            //            OrderDetailItem itmDtl = new OrderDetailItem
+            //            {
+            //                ItemId = itm.ItemId,
+            //                ItemName = itm.ItemName,
+            //                AisleNumber = itm.AisleNumber,
+            //                MaxAllowed = itm.MaxAllowed,
+            //                PointCost = itm.PointCost,
+            //                Quantity = newItemDtl.Quantity
+            //            };
+            //            itemDtl.Add(itmDtl);
+            //        }
+            //        OrderDetailSubCat dtlSubCat = new OrderDetailSubCat
+            //        {
+            //            SubCatId = subCat.SubCatId,
+            //            CategoryId = cat.CategoryId,
+            //            SubCatName = subCat.SubCatName,
+            //            SubCatMaxAllowed = subCat.SubCatMaxAllowed,
+            //            OrderDetailItemList = itemDtl
+            //        };
+            //        subCatDtlList.Add(dtlSubCat);
+            //    }
+
+            //    OrderDetailCategory dtlCat = new OrderDetailCategory
+            //    {
+            //        CategoryId = cat.CategoryId,
+            //        CategoryName = cat.CategoryName,
+            //        OrderDetailSubCatList = subCatDtlList
+            //    };
+            //    catDtlList.Add(dtlCat);
+            //}
+
+            OrderHeaderDetail model = GetOrderById(id);
+
+            model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, model.CreateDateTime.DateTime, model.Deliver, userId);
+            model.OrderDetailCategoryList = GetOrderDetailByOrderId(id, userId);
+
+            return model;
+        }
+
+        public List<OrderDetailCategory> GetOrderDetailByOrderId(int id, string userId)
+        {
+            List<OrderDetailCategory> catDtlList = new List<OrderDetailCategory>();
+
+            var catService = new CategoryService(userId);
+
+            var newCategoryList = catService.GetCategories().OrderBy(o => o.CategoryName);
+            foreach (CareModels.Catagories.CategoryList cat in newCategoryList)
+            {
+                List<OrderDetailSubCat> subCatDtlList = new List<OrderDetailSubCat>();
+                var subCatService = new SubCatService(userId);
+
+                var newSubCatList = subCatService.GetSubCatsByCatId(cat.CategoryId);
+                foreach (CareModels.SubCategories.SubCatListShort subCat in newSubCatList)
+                {
+                    List<OrderDetailItem> itemDtl = new List<OrderDetailItem>();
+                    var itemService = new ItemService(userId);
+
+                    var newItemList = itemService.GetItemsBySubCatId(subCat.SubCatId);
+                    foreach (CareModels.Items.ItemListShort itm in newItemList)
+                    {
+                        //OrderDetailItem snglItemDtl = new OrderDetailItem();
+                        var orderDetailService = new OrderDetailService(userId);
+
+                        var newItemDtl = orderDetailService.GetOrderDetailByOrderIdAndItemId(id, itm.ItemId);
+
+                        OrderDetailItem itmDtl = new OrderDetailItem
+                        {
+                            ItemId = itm.ItemId,
+                            ItemName = itm.ItemName,
+                            AisleNumber = itm.AisleNumber,
+                            MaxAllowed = itm.MaxAllowed,
+                            PointCost = itm.PointCost,
+                            Quantity = newItemDtl.Quantity
+                        };
+                        itemDtl.Add(itmDtl);
+                    }
+                    OrderDetailSubCat dtlSubCat = new OrderDetailSubCat
+                    {
+                        SubCatId = subCat.SubCatId,
+                        CategoryId = cat.CategoryId,
+                        SubCatName = subCat.SubCatName,
+                        SubCatMaxAllowed = subCat.SubCatMaxAllowed,
+                        OrderDetailItemList = itemDtl
+                    };
+                    subCatDtlList.Add(dtlSubCat);
+                }
+
+                OrderDetailCategory dtlCat = new OrderDetailCategory
+                {
+                    CategoryId = cat.CategoryId,
+                    CategoryName = cat.CategoryName,
+                    OrderDetailSubCatList = subCatDtlList
+                };
+                catDtlList.Add(dtlCat);
+            }
+
+            return catDtlList;
         }
 
         ////Move to OrderCreate - begin
@@ -106,26 +290,33 @@ namespace CareServices
         //}
         ////Move to OrderCreate - end
 
-        //public bool CreateItem(ItemCreate model)
-        //{
-        //    var entity =
-        //        new Item()
-        //        {
-        //            //ItemId = model.ItemId,
-        //            SubCatId = model.SubCatId,
-        //            ItemName = model.ItemName,
-        //            AisleNumber = model.AisleNumber,
-        //            MaxAllowed = model.MaxAllowed,
-        //            PointCost = model.PointCost,
-        //            CreateBy = _userId,
-        //            CreateAt = DateTimeOffset.Now
-        //        };
-        //    using (var ctx = new ApplicationDbContext())
-        //    {
-        //        ctx.Items.Add(entity);
-        //        return ctx.SaveChanges() == 1;
-        //    }
-        //}
+        public bool CreateOrder(OrderCreate model)
+        {
+            var entity =
+                new OrderHeader()
+                {
+                    CustId = model.CustId,
+                    SlotId = model.SlotId,
+                    MostWantedNotes = model.MostWantedNotes,
+                    FreezerNotes = model.FreezerNotes,
+                    ProduceNotes = model.ProduceNotes,
+                    NonFoodNotes = model.NonFoodNotes,
+                    Deliver = model.Deliver,
+                    PullStartedAt = null,
+                    PullStartedBy = null,
+                    OrderCompletedAt = null,
+                    CreateBy = _userId,
+                    CreatedAt = DateTimeOffset.Now
+                };
+            using (var ctx = new ApplicationDbContext())
+            {
+                ctx.OrderHeaders.Add(entity);
+
+                //loop here to add Order Detail
+
+                return ctx.SaveChanges() == 1;
+            }
+        }
 
         //public bool UpdateItem(ItemUpdate model)
         //{
@@ -204,5 +395,69 @@ namespace CareServices
 
         //    return weekStartDate;
         //}
+
+        // Get Slot Date/Time from Slot DayOfWeek
+        public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime, bool delivery, string userId)
+        {
+            var timeSlotService = new TimeSlotService(userId);
+
+            var slotDetail = timeSlotService.GetTimeSlotById(slotId);
+
+            DateTime weekStartDate = GetWeekStartDate(createDateTime, delivery, userId);
+
+            return weekStartDate.AddDays(slotDetail.DayOfWeekNum).Add(slotDetail.Time);
+        }
+
+        // Get Slot Date/Time from Slot DayOfWeek
+        public DateTime GetWeekStartDate(DateTime createDateTime, bool delivery, string userId)
+        {
+            // Gets Sunday's Date of the Week where Customers can next pick
+            //    up orders.  If the createDateTime is before the last time
+            //    slot available for pickup, this date will be the Sunday
+            //    before.  Otherwise it will be the Sunday after.
+            // createDateTime passed in will be the DateTime the order was
+            //    created for existing orders or the current DateTime for
+            //    new orders.
+            // Assumption: Customers can start creating orders on the
+            //    day after the last Pickup Slot day and Pickups start
+            //    as early as Sunday
+
+            // Get Last Slot Day and Time. This will be used to determine
+            //    if Sunday will be before or after the createDateTime passed in
+
+            var timeSlotService = new TimeSlotService(userId);
+
+            var slotDetail = timeSlotService.GetMaxTimeSlot();
+            int lastSlotDayOfWeek = slotDetail.DayOfWeekNum;
+            TimeSpan lastSlotTime = slotDetail.Time;
+
+            // To get weekStartDate: 1) strip off time, 2) subtract the
+            //    number of days we are into the next week.
+            // Assumption (again): First day of week for pickup is Sunday
+            int createDayOfWeek = (int)createDateTime.DayOfWeek;
+            DateTime weekStartDate
+                = createDateTime.Date.AddDays(createDayOfWeek * -1);
+            DateTime orderCutoffTime = new DateTime();
+
+            // For Delivery, cutoff time is midnight yesterday.  Otherwise
+            //    it is 2 hours (randomly selected) ago.
+            if (delivery)
+            {
+                orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek);
+            }
+            else
+            {
+                orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek).Add(lastSlotTime).AddMinutes(-120);
+            }
+
+            if (createDateTime >= orderCutoffTime)
+            {
+                // Created after last appointment slot (less buffer)
+                // Need to set Start Date to following Sunday
+                weekStartDate = weekStartDate.AddDays(7);
+            }
+
+            return weekStartDate;
+        }
     }
 }
