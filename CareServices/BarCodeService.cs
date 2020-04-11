@@ -40,6 +40,7 @@ namespace CareServices
                 var query =
                     ctx
                         .BarCodes
+                        .OrderBy(e => e.BarCodeNumber)
                         .Select(
                             e =>
                                 new BarCodeList

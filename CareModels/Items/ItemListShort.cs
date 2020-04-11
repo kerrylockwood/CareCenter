@@ -10,6 +10,8 @@ namespace CareModels.Items
     public class ItemListShort
     {
         [Key]
+        public int OrderDetailId { get; set; }
+
         public int ItemId { get; set; }
 
         [Display(Name = "Item")]

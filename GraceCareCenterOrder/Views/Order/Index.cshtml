@@ -55,7 +55,7 @@
         @Html.DisplayFor(modelItem => item.PullCompleted)
     </td>
     <td>
-        @Html.ActionLink("Edit", "Edit", new { id = item.OrderId }) |
+        @Html.ActionLink("Edit", "Edit", new { id = item.OrderId, isCust = false }) |
         @Html.ActionLink("Details", "Details", new { id = item.OrderId }) |
         @Html.ActionLink("Delete", "Delete", new { id = item.OrderId })
     </td>

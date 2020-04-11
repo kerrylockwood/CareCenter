@@ -10,6 +10,8 @@ namespace CareModels.Orders
     public class OrderDetailItem
     {
         [Key]
+        public int OrderDetailId { get; set; }
+
         public int ItemId { get; set; }
 
         public int SubCatId { get; set; }
@@ -28,5 +30,6 @@ namespace CareModels.Orders
 
         [Display(Name = "Quantity Requested")]
         public int Quantity { get; set; }
+        public int QuantityBefore { get; set; }
     }
 }

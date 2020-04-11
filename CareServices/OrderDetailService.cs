@@ -1,4 +1,5 @@
 ﻿using CareData;
+using CareModels.OrderDetails;
 using CareModels.Orders;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,47 @@ namespace CareServices
         //    }
         //}
 
+        public OrderDetailItem GetOrderDetailById(int orderDetailId)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                if (ctx.OrderDetails.Count(e => e.OrderDetailId == orderDetailId)
+                    == 0)
+                {
+                    return
+                    new OrderDetailItem
+                    {
+                        OrderDetailId = 0,
+                        ItemId = 0,
+                        SubCatId = 0,
+                        ItemName = null,
+                        AisleNumber = 0,
+                        MaxAllowed = 0,
+                        PointCost = 0.0,
+                        Quantity = 0,
+                        QuantityBefore = 0
+                    };
+                }
+                var entity =
+                    ctx
+                        .OrderDetails
+                        .Single(e => e.OrderDetailId == orderDetailId);
+                return
+                    new OrderDetailItem
+                    {
+                        OrderDetailId = entity.OrderDetailId,
+                        ItemId = entity.ItemId,
+                        SubCatId = entity.Item.SubCatId,
+                        ItemName = entity.Item.ItemName,
+                        AisleNumber = entity.Item.AisleNumber,
+                        MaxAllowed = entity.Item.MaxAllowed,
+                        PointCost = entity.Item.PointCost,
+                        Quantity = entity.Quantity,
+                        QuantityBefore = entity.Quantity
+                    };
+            }
+        }
+
         public OrderDetailItem GetOrderDetailByOrderIdAndItemId(int orderId, int itemId)
         {
             using (var ctx = new ApplicationDbContext())
@@ -57,13 +99,15 @@ namespace CareServices
                     return
                     new OrderDetailItem
                     {
+                        OrderDetailId = 0,
                         ItemId = 0,
                         SubCatId = 0,
                         ItemName = null,
                         AisleNumber = 0,
                         MaxAllowed = 0,
                         PointCost = 0.0,
-                        Quantity = 0
+                        Quantity = 0,
+                        QuantityBefore = 0
                     };
                 }
                 var entity =
@@ -73,70 +117,66 @@ namespace CareServices
                 return
                     new OrderDetailItem
                     {
+                        OrderDetailId = entity.OrderDetailId,
                         ItemId = entity.ItemId,
                         SubCatId = entity.Item.SubCatId,
                         ItemName = entity.Item.ItemName,
                         AisleNumber = entity.Item.AisleNumber,
                         MaxAllowed = entity.Item.MaxAllowed,
                         PointCost = entity.Item.PointCost,
-                        Quantity = entity.Quantity
+                        Quantity = entity.Quantity,
+                        QuantityBefore = entity.Quantity
                     };
             }
         }
 
-        //public bool CreateItem(ItemCreate model)
-        //{
-        //    var entity =
-        //        new Item()
-        //        {
-        //            //ItemId = model.ItemId,
-        //            SubCatId = model.SubCatId,
-        //            ItemName = model.ItemName,
-        //            AisleNumber = model.AisleNumber,
-        //            MaxAllowed = model.MaxAllowed,
-        //            PointCost = model.PointCost,
-        //            CreateBy = _userId,
-        //            CreateAt = DateTimeOffset.Now
-        //        };
-        //    using (var ctx = new ApplicationDbContext())
-        //    {
-        //        ctx.Items.Add(entity);
-        //        return ctx.SaveChanges() == 1;
-        //    }
-        //}
+        public bool CreateOrderDetail(OrderDetailCreate model)
+        {
+            var entity =
+                new OrderDetail()
+                {
+                    OrderId = model.OrderId,
+                    ItemId = model.ItemId,
+                    Quantity = model.Quantity,
+                    Filled = model.Filled
+                };
+            using (var ctx = new ApplicationDbContext())
+            {
+                ctx.OrderDetails.Add(entity);
+                return ctx.SaveChanges() == 1;
+            }
+        }
 
-        //public bool UpdateItem(ItemUpdate model)
-        //{
-        //    using (var ctx = new ApplicationDbContext())
-        //    {
-        //        var entity =
-        //            ctx
-        //                .Items
-        //                .Single(e => e.ItemId == model.ItemId);
-        //        entity.SubCatId = model.SubCatId;
-        //        entity.ItemName = model.ItemName;
-        //        entity.AisleNumber = model.AisleNumber;
-        //        entity.MaxAllowed = model.MaxAllowed;
-        //        entity.PointCost = model.PointCost;
+        public bool UpdateOrderDetail(OrderDetailUpdate model)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                        .OrderDetails
+                        .Single(e => e.OrderDetailId == model.OrderDetailId);
+                entity.ItemId = model.ItemId;
+                entity.Quantity = model.Quantity;
+                entity.Filled = model.Filled;
 
-        //        return ctx.SaveChanges() == 1;
-        //    }
-        //}
+                return ctx.SaveChanges() == 1;
+            }
+        }
 
-        //public bool DeleteItem(int id)
-        //{
-        //    using (var ctx = new ApplicationDbContext())
-        //    {
-        //        var entity =
-        //            ctx
-        //                .Items
-        //                .Single(e => e.ItemId == id);
+        public bool DeleteOrderDetail(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                        .OrderDetails
+                        .Single(e => e.OrderDetailId == id);
 
-        //        ctx.Items.Remove(entity);
+                ctx.OrderDetails.Remove(entity);
 
-        //        return ctx.SaveChanges() == 1;
-        //    }
-        //}
+                return ctx.SaveChanges() == 1;
+            }
+        }
 
         //// Get Slot Date/Time from Slot DayOfWeek
         //public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime)

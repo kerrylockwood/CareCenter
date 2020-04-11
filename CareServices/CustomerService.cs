@@ -77,7 +77,7 @@ namespace CareServices
                     {
                         CustomerId = entity.CustomerId,
                         BarCodeId = entity.BarCodeId,
-                        BarCodeNumber = entity.BarCode.BarCodeNumber,
+                        BarCodeNumber = (entity.BarCodeId == null) ? 0 : entity.BarCode.BarCodeNumber,
                         FirstName = entity.FirstName,
                         LastName = entity.LastName,
                         Address = entity.Address,

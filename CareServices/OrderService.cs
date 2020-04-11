@@ -1,4 +1,5 @@
 ﻿using CareData;
+using CareModels.OrderDetails;
 using CareModels.Orders;
 using CareModels.TimeSlots;
 using System;
@@ -48,7 +49,7 @@ namespace CareServices
             }
         }
 
-        public OrderHeaderDetail GetOrderHeaderByCustId(int id)
+        public OrderHeaderDetail GetOrderHeaderByCustId(int id, bool isCust)
         {
             using (var ctx = new ApplicationDbContext())
             {
@@ -59,13 +60,14 @@ namespace CareServices
                 var entity =
                     ctx
                         .OrderHeaders
-                        .Single(e => e.OrderId == id);
+                        .SingleOrDefault(e => e.CustId == id);
                 return
                 new OrderHeaderDetail
                 {
                     OrderId = entity.OrderId,
                     CustId = entity.CustId,
                     SlotId = entity.TimeSlot.SlotId,
+                    IsCust = isCust,
                     SlotDateTime = new DateTime(),
                     CustFirstName = entity.Customer.FirstName,
                     CustLastName = entity.Customer.LastName,
@@ -86,7 +88,7 @@ namespace CareServices
             }
         }
 
-        public OrderHeaderDetail GetOrderById(int id)
+        public OrderHeaderDetail GetOrderById(int id, bool isCust)
         {
             using (var ctx = new ApplicationDbContext())
             {
@@ -100,6 +102,7 @@ namespace CareServices
                     OrderId = entity.OrderId,
                     CustId = entity.CustId,
                     SlotId = entity.TimeSlot.SlotId,
+                    IsCust = isCust,
                     SlotDateTime = new DateTime(),
                     CustFirstName = entity.Customer.FirstName,
                     CustLastName = entity.Customer.LastName,
@@ -136,72 +139,29 @@ namespace CareServices
             }
         }
 
-        public OrderHeaderDetail GetOrderWithDetailById(int id, string userId)
+        public OrderHeaderDetail GetOrderWithDetailById(int id, string userId, bool isCust)
         {
-            //List<OrderDetailCategory> catDtlList = new List<OrderDetailCategory>();
-
-            //var catService = new CategoryService(userId);
-
-            //var newCategoryList = catService.GetCategories().OrderBy(o => o.CategoryName);
-            //foreach (CareModels.Catagories.CategoryList cat in newCategoryList)
-            //{
-            //    List<OrderDetailSubCat> subCatDtlList = new List<OrderDetailSubCat>();
-            //    var subCatService = new SubCatService(userId);
-
-            //    var newSubCatList = subCatService.GetSubCatsByCatId(cat.CategoryId);
-            //    foreach (CareModels.SubCategories.SubCatListShort subCat in newSubCatList)
-            //    {
-            //        List<OrderDetailItem> itemDtl = new List<OrderDetailItem>();
-            //        var itemService = new ItemService(userId);
-
-            //        var newItemList = itemService.GetItemsBySubCatId(subCat.SubCatId);
-            //        foreach (CareModels.Items.ItemListShort itm in newItemList)
-            //        {
-            //            //OrderDetailItem snglItemDtl = new OrderDetailItem();
-            //            var orderDetailService = new OrderDetailService(userId);
-
-            //            var newItemDtl = orderDetailService.GetOrderDetailByOrderIdAndItemId(id, itm.ItemId);
-
-            //            OrderDetailItem itmDtl = new OrderDetailItem
-            //            {
-            //                ItemId = itm.ItemId,
-            //                ItemName = itm.ItemName,
-            //                AisleNumber = itm.AisleNumber,
-            //                MaxAllowed = itm.MaxAllowed,
-            //                PointCost = itm.PointCost,
-            //                Quantity = newItemDtl.Quantity
-            //            };
-            //            itemDtl.Add(itmDtl);
-            //        }
-            //        OrderDetailSubCat dtlSubCat = new OrderDetailSubCat
-            //        {
-            //            SubCatId = subCat.SubCatId,
-            //            CategoryId = cat.CategoryId,
-            //            SubCatName = subCat.SubCatName,
-            //            SubCatMaxAllowed = subCat.SubCatMaxAllowed,
-            //            OrderDetailItemList = itemDtl
-            //        };
-            //        subCatDtlList.Add(dtlSubCat);
-            //    }
-
-            //    OrderDetailCategory dtlCat = new OrderDetailCategory
-            //    {
-            //        CategoryId = cat.CategoryId,
-            //        CategoryName = cat.CategoryName,
-            //        OrderDetailSubCatList = subCatDtlList
-            //    };
-            //    catDtlList.Add(dtlCat);
-            //}
-
-            OrderHeaderDetail model = GetOrderById(id);
+            OrderHeaderDetail model = GetOrderById(id, isCust);
 
             model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, model.CreateDateTime.DateTime, model.Deliver, userId);
-            model.OrderDetailCategoryList = GetOrderDetailByOrderId(id, userId);
+            bool shortList = false;
+            model.OrderDetailCategoryList = GetOrderDetailByOrderId(id, userId, shortList);
 
             return model;
         }
 
-        public List<OrderDetailCategory> GetOrderDetailByOrderId(int id, string userId)
+        public OrderHeaderDetail GetOrderWithShortDetailById(int id, string userId, bool isCust)
+        {
+            OrderHeaderDetail model = GetOrderById(id, isCust);
+
+            model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, model.CreateDateTime.DateTime, model.Deliver, userId);
+            bool shortList = true;
+            model.OrderDetailCategoryList = GetOrderDetailByOrderId(id, userId, shortList);
+
+            return model;
+        }
+
+        public List<OrderDetailCategory> GetOrderDetailByOrderId(int id, string userId, bool shortList)
         {
             List<OrderDetailCategory> catDtlList = new List<OrderDetailCategory>();
 
@@ -227,16 +187,21 @@ namespace CareServices
 
                         var newItemDtl = orderDetailService.GetOrderDetailByOrderIdAndItemId(id, itm.ItemId);
 
-                        OrderDetailItem itmDtl = new OrderDetailItem
+                        if ((shortList && newItemDtl.ItemId > 0) || !shortList)
                         {
-                            ItemId = itm.ItemId,
-                            ItemName = itm.ItemName,
-                            AisleNumber = itm.AisleNumber,
-                            MaxAllowed = itm.MaxAllowed,
-                            PointCost = itm.PointCost,
-                            Quantity = newItemDtl.Quantity
-                        };
-                        itemDtl.Add(itmDtl);
+                            OrderDetailItem itmDtl = new OrderDetailItem
+                            {
+                                OrderDetailId = newItemDtl.OrderDetailId,
+                                ItemId = itm.ItemId,
+                                ItemName = itm.ItemName,
+                                AisleNumber = itm.AisleNumber,
+                                MaxAllowed = itm.MaxAllowed,
+                                PointCost = itm.PointCost,
+                                Quantity = newItemDtl.Quantity,
+                                QuantityBefore = newItemDtl.Quantity
+                            };
+                            itemDtl.Add(itmDtl);
+                        }
                     }
                     OrderDetailSubCat dtlSubCat = new OrderDetailSubCat
                     {
@@ -261,37 +226,14 @@ namespace CareServices
             return catDtlList;
         }
 
-        ////Move to OrderCreate - begin
-        //// GET: Customer/BarCode
-        //public ActionResult BarCodeDetails()
-        //{
-        //    return View();
-        //}
-
-        //// POST: Customer/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult BarCodeValidate(CustBarCode model)
-        //{
-        //    if (!ModelState.IsValid) return View(model);
-
-        //    var service = CreateCustomerService();
-
-        //    if (service.ValidateCustBarCode(model.BarCodeNumber) == null && model.BarCodeNumber > 0)
-        //    {
-        //        ModelState.AddModelError("", $"'{model.BarCodeNumber}' is not a valid Bar Code Number.  Please re-enter or contact a member of the Food Pantry team.");
-
-        //        return View(model);
-        //    };
-
-        //    TempData["BarCodeId"] = model.BarCodeId;
-        //    TempData["BarCodeNumber"] = model.BarCodeNumber;
-        //    return RedirectToAction("Create");
-        //}
-        ////Move to OrderCreate - end
-
-        public bool CreateOrder(OrderCreate model)
+        public OrderCrtUpdRtnStatus CreateOrder(OrderCreate model)
         {
+            OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
+            {
+                OrderHeaderCreated = false,
+                OrderAllDetailCreated = false,
+                OrderId = 0
+            };
             var entity =
                 new OrderHeader()
                 {
@@ -312,10 +254,154 @@ namespace CareServices
             {
                 ctx.OrderHeaders.Add(entity);
 
-                //loop here to add Order Detail
+                try { ctx.SaveChanges(); }
+                catch { return orderRtnStatus; }
 
-                return ctx.SaveChanges() == 1;
+                orderRtnStatus.OrderHeaderCreated = true;
+                orderRtnStatus.OrderId = entity.OrderId;
+
+                // Assume all OrderDetail records will be written - make false if any fail.
+                orderRtnStatus.OrderAllDetailCreated = true;
+                OrderDetailService orderDetailService = new OrderDetailService(_userId);
+
+                // Add Order Detail
+                foreach (var catagory in model.OrderDetailCategoryList)
+                {
+                    foreach (var subCat in catagory.OrderDetailSubCatList)
+                    {
+                        if (subCat.OrderDetailItemList != null)
+                        {
+                            foreach (var itm in subCat.OrderDetailItemList)
+                            {
+                                if (itm.Quantity > 0)
+                                {
+                                    var orderDetail =
+                                        new OrderDetailCreate()
+                                        {
+                                            OrderId = orderRtnStatus.OrderId,
+                                            ItemId = itm.ItemId,
+                                            Quantity = itm.Quantity,
+                                            QuantityBefore = itm.Quantity,
+                                            Filled = false
+                                        };
+
+                                    if (!orderDetailService.CreateOrderDetail(orderDetail))
+                                    {
+                                        orderRtnStatus.OrderAllDetailCreated = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
+            return orderRtnStatus;
+        }
+
+        public OrderCrtUpdRtnStatus UpdateOrder(OrderUpdate model)
+        {
+            OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
+            {
+                OrderHeaderCreated = false,
+                OrderAllDetailCreated = false,
+                OrderId = 0
+            };
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                    .OrderHeaders
+                    .Single(e => e.OrderId == model.OrderId);
+                entity.CustId = model.CustId;
+                entity.SlotId = model.SlotId;
+                entity.MostWantedNotes = model.MostWantedNotes;
+                entity.FreezerNotes = model.FreezerNotes;
+                entity.ProduceNotes = model.ProduceNotes;
+                entity.NonFoodNotes = model.NonFoodNotes;
+                entity.Deliver = model.Deliver;
+                entity.PullStartedAt = null;
+                entity.PullStartedBy = null;
+                entity.OrderCompletedAt = null;
+
+                try { ctx.SaveChanges(); }
+                catch { return orderRtnStatus; }
+            }
+            orderRtnStatus.OrderHeaderCreated = true;
+
+            orderRtnStatus.OrderId = model.OrderId;
+
+            // Assume all OrderDetail records will be created/updated/deleted - make false if any fail.
+            orderRtnStatus.OrderAllDetailCreated = true;
+            OrderDetailService orderDetailService = new OrderDetailService(_userId);
+
+            // Add Order Detail
+            foreach (var catagory in model.OrderDetailCategoryList)
+            {
+                foreach (var subCat in catagory.OrderDetailSubCatList)
+                {
+                    if (subCat.OrderDetailItemList != null)
+                    {
+                        foreach (var itm in subCat.OrderDetailItemList)
+                        {
+                            if (itm.Quantity != itm.QuantityBefore)
+                            {
+                                if (itm.Quantity > 0 && itm.QuantityBefore > 0)
+                                {
+                                    // Quantity changed
+                                    var orderDetail =
+                                        new OrderDetailUpdate()
+                                        {
+                                            OrderDetailId = itm.OrderDetailId,
+                                            ItemId = itm.ItemId,
+                                            Quantity = itm.Quantity,
+                                            Filled = false
+                                        };
+
+                                    if (!orderDetailService.UpdateOrderDetail(orderDetail))
+                                    {
+                                        orderRtnStatus.OrderAllDetailCreated = false;
+                                    }
+                                }
+                                else if (itm.Quantity > 0)
+                                {
+                                    // Add Detail
+                                    var orderDetail =
+                                        new OrderDetailCreate()
+                                        {
+                                            OrderId = orderRtnStatus.OrderId,
+                                            ItemId = itm.ItemId,
+                                            Quantity = itm.Quantity,
+                                            Filled = false
+                                        };
+
+                                    if (!orderDetailService.CreateOrderDetail(orderDetail))
+                                    {
+                                        orderRtnStatus.OrderAllDetailCreated = false;
+                                    }
+                                }
+                                else if (itm.QuantityBefore > 0)
+                                {
+                                    // Delete Detail
+                                    //var orderDetail =
+                                    //    new OrderDetailCreate()
+                                    //    {
+                                    //        OrderId = orderRtnStatus.OrderId,
+                                    //        ItemId = itm.ItemId,
+                                    //        Quantity = itm.Quantity,
+                                    //        Filled = false
+                                    //    };
+
+                                    if (!orderDetailService.DeleteOrderDetail(itm.OrderDetailId))
+                                    {
+                                        orderRtnStatus.OrderAllDetailCreated = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return orderRtnStatus;
         }
 
         //public bool UpdateItem(ItemUpdate model)
@@ -336,20 +422,20 @@ namespace CareServices
         //    }
         //}
 
-        //public bool DeleteItem(int id)
-        //{
-        //    using (var ctx = new ApplicationDbContext())
-        //    {
-        //        var entity =
-        //            ctx
-        //                .Items
-        //                .Single(e => e.ItemId == id);
+        public bool DeleteOrder(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                        .OrderHeaders
+                        .Single(e => e.OrderId == id);
 
-        //        ctx.Items.Remove(entity);
+                ctx.OrderHeaders.Remove(entity);
 
-        //        return ctx.SaveChanges() == 1;
-        //    }
-        //}
+                return ctx.SaveChanges() == 1;
+            }
+        }
 
         //// Get Slot Date/Time from Slot DayOfWeek
         //public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime)

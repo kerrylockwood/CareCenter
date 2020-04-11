@@ -116,7 +116,7 @@ namespace GraceCareCenterOrder.Controllers
                     if (newCustId > 0)
                     {
                         // Order cannot exist - must create it
-                        return RedirectToAction(actionName: "Create", controllerName: "Order", routeValues: new { CustId = newCustId });
+                        return RedirectToAction(actionName: "Create", controllerName: "Order", routeValues: new { CustId = newCustId, IsCust = true });
                     };
                 }
                 else
@@ -135,7 +135,7 @@ namespace GraceCareCenterOrder.Controllers
             if (!model.IsOrder)
             {
                 // This is NOT an order, must validate that Barcode does not exist
-                if (existingCustDetail != null)
+                if (existingCustDetail.BarCodeId != null)
                 {
                     ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
 
@@ -239,11 +239,11 @@ namespace GraceCareCenterOrder.Controllers
                     var userId = User.Identity.GetUserId();
                     var orderHeaderService = new OrderService(userId);
 
-                    var existingOrderHeader = orderHeaderService.GetOrderHeaderByCustId(id);
+                    var existingOrderHeader = orderHeaderService.GetOrderHeaderByCustId(id, false);
                     if (existingOrderHeader.OrderId == 0)
                     {
                         // Order does not Exist
-                        return RedirectToAction(actionName: "Create", controllerName: "Order", routeValues: new { CustId = id, IsCust = model.IsOrder });
+                        return RedirectToAction(actionName: "Create", controllerName: "Order", routeValues: new { CustId = id, IsCust = model.IsCust });
                     }
                     // Order Exists
                     if (existingOrderHeader.PullStartedAt != null)
@@ -251,7 +251,7 @@ namespace GraceCareCenterOrder.Controllers
                         TempData["SaveResult"] = "We are assembling your order now. Your order can no longer be changed.";
                         return RedirectToAction("Index", "Home");
                     }
-                    return RedirectToAction("=====Order Update - need to send Cust data=====");
+                    return RedirectToAction(actionName: "Edit", controllerName: "Order", routeValues: new { Id = existingOrderHeader.OrderId, IsCust = model.IsCust });
                 }
                 TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was updated.";
                 return RedirectToAction("Index");

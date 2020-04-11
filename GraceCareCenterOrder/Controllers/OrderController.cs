@@ -1,5 +1,6 @@
 ﻿using CareModels.BarCodes;
 using CareModels.Customers;
+using CareModels.OrderDetails;
 using CareModels.Orders;
 using CareServices;
 using Microsoft.AspNet.Identity;
@@ -88,12 +89,13 @@ namespace GraceCareCenterOrder.Controllers
 
             CustDetail custDetail = custService.GetCustById(custId);
 
+            bool shortList = false;
             OrderCreate model = new OrderCreate
             {
                 CustName = $"{custDetail.FirstName} {custDetail.LastName}",
                 CustId = custId,
                 IsCust = isCust,
-                OrderDetailCategoryList = orderService.GetOrderDetailByOrderId(0, userId)
+                OrderDetailCategoryList = orderService.GetOrderDetailByOrderId(0, userId, shortList)
             };
 
             ViewBag.SlotId = BuildTimeSlotDropdown(false);
@@ -110,13 +112,27 @@ namespace GraceCareCenterOrder.Controllers
 
             var service = CreateOrderService();
 
-            if (service.CreateOrder(model))
+            OrderCrtUpdRtnStatus orderRtnStatus = service.CreateOrder(model);
+            if (orderRtnStatus.OrderHeaderCreated)
             {
+                if (orderRtnStatus.OrderAllDetailCreated)
+                {
+                    TempData["SaveResult"] = $"Order created - but not all Items were added. Please review the order.";
+                    if (model.IsCust)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    return RedirectToAction("Index");
+                }
                 TempData["SaveResult"] = $"Order created";
+                if (model.IsCust)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
                 return RedirectToAction("Index");
             };
 
-            ModelState.AddModelError("", $"Order could not be created.");
+            ModelState.AddModelError("", "Order could not be created.");
 
             ViewBag.TimeSlotId = BuildTimeSlotDropdown(model.Deliver);
 
@@ -130,97 +146,91 @@ namespace GraceCareCenterOrder.Controllers
             var userId = User.Identity.GetUserId();
 
             var orderService = CreateOrderService();
-            var model = orderService.GetOrderWithDetailById(id, userId);
+            bool isCust = false;
+            var model = orderService.GetOrderWithShortDetailById(id, userId, isCust);
 
             return View(model);
         }
 
-        //// GET: Order/Update
-        //public ActionResult Edit(int id)
-        //{
-        //    var service = CreateCustomerService();
-        //    var detail = service.GetCustById(id);
-        //    var model =
-        //        new CustUpdate
-        //        {
-        //            CustomerId = detail.CustomerId,
-        //            BarCodeId = detail.BarCodeId,
-        //            FirstName = detail.FirstName,
-        //            LastName = detail.LastName,
-        //            Address = detail.Address,
-        //            City = detail.City,
-        //            State = detail.State,
-        //            ZipCode = detail.ZipCode,
-        //            Phone = detail.Phone,
-        //            Email = detail.Email,
-        //            NumberKids = detail.NumberKids
-        //        };
+        // GET: Order/Update
+        public ActionResult Edit(int id, bool isCust)
+        {
+            var userId = User.Identity.GetUserId();
 
-        //    ViewBag.BarCodeId = BuildBarCodeDropdown();
+            var orderService = CreateOrderService();
+            var model = orderService.GetOrderWithDetailById(id, userId, isCust);
 
-        //    return View(model);
-        //}
+            ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver);
 
-        //// GET: Order/Update
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, CustUpdate model)
-        //{
-        //    if (!ModelState.IsValid) return View(model);
+            return View(model);
+        }
 
-        //    if (model.CustomerId != id)
-        //    {
-        //        ModelState.AddModelError("", "Id Mismatch");
-        //        return View(model);
-        //    }
+        // GET: Order/Update
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, OrderUpdate model)
+        {
+            if (!ModelState.IsValid) return View(model);
 
-        //    var service = CreateCustomerService();
+            if (model.OrderId != id)
+            {
+                ModelState.AddModelError("", "Id Mismatch");
+                return View(model);
+            }
 
-        //    CustDetail existingCustDetail = service.GetCustByBarCodeId(model.BarCodeId);
-        //    if (existingCustDetail != null && existingCustDetail.BarCodeId != id)
-        //    {
-        //        ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
+            var service = CreateOrderService();
 
-        //        ViewBag.BarCodeId = BuildBarCodeDropdown();
+            OrderCrtUpdRtnStatus orderRtnStatus = service.UpdateOrder(model);
+            if (orderRtnStatus.OrderHeaderCreated)
+            {
+                if (orderRtnStatus.OrderAllDetailCreated)
+                {
+                    TempData["SaveResult"] = $"Order was updated.";
+                    if (model.IsCust)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    return RedirectToAction("Index");
+                }
+                TempData["SaveResult"] = $"Order was updated - not all Items were updated. Please review the order.";
+                if (model.IsCust)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                return RedirectToAction("Index");
+            }
 
-        //        return View(model);
-        //    }
-        //    if (service.UpdateCust(model))
-        //    {
-        //        TempData["SaveResult"] = $"'{model.FirstName} {model.LastName}' was updated.";
-        //        return RedirectToAction("Index");
-        //    }
+            ModelState.AddModelError("", "Order could not be updated.");
 
-        //    ModelState.AddModelError("", $"'{model.FirstName} {model.LastName}' could not be updated.");
+            return View(model);
+        }
 
-        //    ViewBag.BarCodeId = BuildBarCodeDropdown();
+        // GET: Order/Delete
+        public ActionResult Delete(int id)
+        {
+            var userId = User.Identity.GetUserId();
 
-        //    return View(model);
-        //}
+            var orderService = CreateOrderService();
+            bool isCust = false;
+            var model = orderService.GetOrderWithShortDetailById(id, userId, isCust);
 
-        //// GET: Order/Delete
-        //public ActionResult Delete(int id)
-        //{
-        //    var svc = CreateCustomerService();
-        //    var model = svc.GetCustById(id);
+            return View(model);
+        }
 
-        //    return View(model);
-        //}
+        // GET: Order/Delete
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeletePost(int id)
+        {
+            var service = CreateOrderService();
 
-        //// GET: Order/Delete
-        //[HttpPost]
-        //[ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult DeletePost(int id)
-        //{
-        //    var service = CreateCustomerService();
+            service.DeleteOrder(id);
 
-        //    service.DeleteCust(id);
+            TempData["SaveResult"] = $"Order was deleted";
 
-        //    TempData["SaveResult"] = $"Customer was deleted";
-
-        //    return RedirectToAction("Index");
-        //}
+            return RedirectToAction("Index");
+        }
 
         // Create Order Service
         private OrderService CreateOrderService()

@@ -1,10 +1,10 @@
-﻿@model CareModels.Orders.OrderCreate
+﻿@model CareModels.Orders.OrderHeaderDetail
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Edit";
 }
 
-<h2>Create</h2>
+<h2>Order</h2>
 
 
 @using (Html.BeginForm())
@@ -12,36 +12,27 @@
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <h4>OrderCreate</h4>
+        <h4>
+            Update Order for @Html.DisplayFor(model => model.CustFirstName) @Html.DisplayFor(model => model.CustLastName)
+        </h4>
+
         <hr />
-        @if (TempData.ContainsKey("SaveResult"))
-        {
-            <div class="Alert alert-success fade in" role="alert">
-                @ViewBag.SaveResult
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
-                @TempData["SaveResult"]
-            </div>
-        }
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
+        @Html.HiddenFor(model => model.OrderId)
         @Html.HiddenFor(model => model.CustId)
+        @Html.HiddenFor(model => model.SlotId)
         @Html.HiddenFor(model => model.IsCust)
+        @Html.HiddenFor(model => model.PullStartedAt)
+        @Html.HiddenFor(model => model.PullStartedBy)
+        @Html.HiddenFor(model => model.PullStartedName)
+        @Html.HiddenFor(model => model.OrderCompletedAt)
+        @Html.HiddenFor(model => model.PullCompleted)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.CustName, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.SlotDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.CustName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.CustName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.SlotId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("SlotId", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.SlotId, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.SlotDateTime, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SlotDateTime, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -58,7 +49,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.MostWantedNotes, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextAreaFor(model => model.MostWantedNotes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.MostWantedNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.MostWantedNotes, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -66,7 +57,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.FreezerNotes, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextAreaFor(model => model.FreezerNotes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.FreezerNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.FreezerNotes, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -74,7 +65,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ProduceNotes, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextAreaFor(model => model.ProduceNotes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.ProduceNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.ProduceNotes, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -82,8 +73,24 @@
         <div class="form-group">
             @Html.LabelFor(model => model.NonFoodNotes, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.TextAreaFor(model => model.NonFoodNotes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.NonFoodNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.NonFoodNotes, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CreateName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CreateName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CreateName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CreateDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CreateDateTime, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CreateDateTime, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -151,10 +158,12 @@
                                         @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
                                     </td>
                                     <td hidden>
+                                        @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].OrderDetailId)
                                         @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemId)
                                         @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemName)
                                         @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].PointCost)
                                         @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
+                                        @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].QuantityBefore)
                                     </td>
                                 </tr>
                             }
@@ -165,20 +174,9 @@
 
         </div>
 
-        @if (TempData.ContainsKey("SaveResult"))
-        {
-            <div class="Alert alert-success fade in" role="alert">
-                @ViewBag.SaveResult
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
-                @TempData["SaveResult"]
-            </div>
-        }
-
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </div>
     </div>
@@ -186,9 +184,9 @@
 
 @if (Model.IsCust)
 {
-    <div>
-        @Html.ActionLink(linkText: "Back to Customer Information", actionName: "Update", controllerName: "Customer", routeValues: new { isCust = true, isOrder = true, id = Model.CustId }, htmlAttributes: new { })
-    </div>
+<div>
+    @Html.ActionLink(linkText: "Back to Customer Information", actionName: "Update", controllerName: "Customer", routeValues: new { isCust = true, isOrder = true, id = Model.CustId }, htmlAttributes: new { })
+</div>
 }
 @if (!Model.IsCust)
 {
