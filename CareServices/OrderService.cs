@@ -123,6 +123,42 @@ namespace CareServices
             }
         }
 
+        public OrderUpdate GetOrderUpdateById(int id, bool isCust)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                        .OrderHeaders
+                        .Single(e => e.OrderId == id);
+                return
+                new OrderUpdate
+                {
+                    OrderId = entity.OrderId,
+                    CustId = entity.CustId,
+                    SlotId = entity.TimeSlot.SlotId,
+                    IsCust = isCust,
+                    SlotDateTime = new DateTime(),
+                    CustName = $"{entity.Customer.FirstName} {entity.Customer.LastName}",
+                    //CustFirstName = entity.Customer.FirstName,
+                    //CustLastName = entity.Customer.LastName,
+                    Deliver = entity.Deliver,
+                    //PullStartedAt = entity.PullStartedAt,
+                    //PullStartedBy = entity.PullStartedBy,
+                    //PullStartedName = (entity.PullStartedBy == null) ? null : entity.PullStartedUser.UserName,
+                    //OrderCompletedAt = entity.OrderCompletedAt,
+                    //PullCompleted = (entity.OrderCompletedAt == null) ? false : true,
+                    MostWantedNotes = entity.MostWantedNotes,
+                    FreezerNotes = entity.FreezerNotes,
+                    ProduceNotes = entity.ProduceNotes,
+                    NonFoodNotes = entity.NonFoodNotes,
+                    CreateDateTime = entity.CreatedAt,
+                    //CreateName = entity.User.UserName,
+                    OrderDetailCategoryList = new List<OrderDetailCategory>()
+                };
+            }
+        }
+
         public int GetSlotCount(int slotId, bool delivery)
         {
             using (var ctx = new ApplicationDbContext())
@@ -139,9 +175,11 @@ namespace CareServices
             }
         }
 
-        public OrderHeaderDetail GetOrderWithDetailById(int id, string userId, bool isCust)
+        //public OrderHeaderDetail GetOrderWithDetailById(int id, string userId, bool isCust)
+        public OrderUpdate GetOrderWithDetailById(int id, string userId, bool isCust)
         {
-            OrderHeaderDetail model = GetOrderById(id, isCust);
+            //OrderHeaderDetail model = GetOrderById(id, isCust);
+            OrderUpdate model = GetOrderUpdateById(id, isCust);
 
             model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, model.CreateDateTime.DateTime, model.Deliver, userId);
             bool shortList = false;
@@ -173,6 +211,7 @@ namespace CareServices
                 List<OrderDetailSubCat> subCatDtlList = new List<OrderDetailSubCat>();
                 var subCatService = new SubCatService(userId);
 
+                bool subCatAdded = false;
                 var newSubCatList = subCatService.GetSubCatsByCatId(cat.CategoryId);
                 foreach (CareModels.SubCategories.SubCatListShort subCat in newSubCatList)
                 {
@@ -180,6 +219,7 @@ namespace CareServices
                     var itemService = new ItemService(userId);
 
                     var newItemList = itemService.GetItemsBySubCatId(subCat.SubCatId);
+                    bool itemAdded = false;
                     foreach (CareModels.Items.ItemListShort itm in newItemList)
                     {
                         //OrderDetailItem snglItemDtl = new OrderDetailItem();
@@ -201,26 +241,33 @@ namespace CareServices
                                 QuantityBefore = newItemDtl.Quantity
                             };
                             itemDtl.Add(itmDtl);
+                            itemAdded = true;
                         }
                     }
-                    OrderDetailSubCat dtlSubCat = new OrderDetailSubCat
+                    if (itemAdded)
                     {
-                        SubCatId = subCat.SubCatId,
-                        CategoryId = cat.CategoryId,
-                        SubCatName = subCat.SubCatName,
-                        SubCatMaxAllowed = subCat.SubCatMaxAllowed,
-                        OrderDetailItemList = itemDtl
-                    };
-                    subCatDtlList.Add(dtlSubCat);
+                        OrderDetailSubCat dtlSubCat = new OrderDetailSubCat
+                        {
+                            SubCatId = subCat.SubCatId,
+                            CategoryId = cat.CategoryId,
+                            SubCatName = subCat.SubCatName,
+                            SubCatMaxAllowed = subCat.SubCatMaxAllowed,
+                            OrderDetailItemList = itemDtl
+                        };
+                        subCatDtlList.Add(dtlSubCat);
+                        subCatAdded = true;
+                    }
                 }
-
-                OrderDetailCategory dtlCat = new OrderDetailCategory
+                if (subCatAdded)
                 {
-                    CategoryId = cat.CategoryId,
-                    CategoryName = cat.CategoryName,
-                    OrderDetailSubCatList = subCatDtlList
-                };
-                catDtlList.Add(dtlCat);
+                    OrderDetailCategory dtlCat = new OrderDetailCategory
+                    {
+                        CategoryId = cat.CategoryId,
+                        CategoryName = cat.CategoryName,
+                        OrderDetailSubCatList = subCatDtlList
+                    };
+                    catDtlList.Add(dtlCat);
+                }
             }
 
             return catDtlList;

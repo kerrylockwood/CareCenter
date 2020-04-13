@@ -40,6 +40,8 @@ namespace CareModels.Orders
         [MaxLength(1000, ErrorMessage = "Please limit your comment to 1000 characters")]
         public string NonFoodNotes { get; set; }
 
+        public DateTimeOffset CreateDateTime { get; set; }
+
         public List<OrderDetailCategory> OrderDetailCategoryList { get; set; }
     }
 }

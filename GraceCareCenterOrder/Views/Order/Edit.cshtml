@@ -1,4 +1,4 @@
-﻿@model CareModels.Orders.OrderHeaderDetail
+﻿@model CareModels.Orders.OrderUpdate
 
 @{
     ViewBag.Title = "Edit";
@@ -13,7 +13,7 @@
 
     <div class="form-horizontal">
         <h4>
-            Update Order for @Html.DisplayFor(model => model.CustFirstName) @Html.DisplayFor(model => model.CustLastName)
+            Update Order for @Html.DisplayFor(model => model.CustName)
         </h4>
 
         <hr />
@@ -22,11 +22,11 @@
         @Html.HiddenFor(model => model.CustId)
         @Html.HiddenFor(model => model.SlotId)
         @Html.HiddenFor(model => model.IsCust)
-        @Html.HiddenFor(model => model.PullStartedAt)
+        @*@Html.HiddenFor(model => model.PullStartedAt)
         @Html.HiddenFor(model => model.PullStartedBy)
         @Html.HiddenFor(model => model.PullStartedName)
         @Html.HiddenFor(model => model.OrderCompletedAt)
-        @Html.HiddenFor(model => model.PullCompleted)
+        @Html.HiddenFor(model => model.PullCompleted)*@
 
         <div class="form-group">
             @Html.LabelFor(model => model.SlotDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -78,13 +78,13 @@
             </div>
         </div>
 
-        <div class="form-group">
+        @*<div class="form-group">
             @Html.LabelFor(model => model.CreateName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.CreateName, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.CreateName, "", new { @class = "text-danger" })
             </div>
-        </div>
+        </div>*@
 
         <div class="form-group">
             @Html.LabelFor(model => model.CreateDateTime, htmlAttributes: new { @class = "control-label col-md-2" })

@@ -156,6 +156,6 @@
     }
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.OrderId }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.OrderId, isCust = Model.IsCust }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

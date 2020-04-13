@@ -110,6 +110,9 @@ namespace GraceCareCenterOrder.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
+            string errorFound = EditItems(model.OrderDetailCategoryList);
+            if (errorFound != null) return View(model);
+
             var service = CreateOrderService();
 
             OrderCrtUpdRtnStatus orderRtnStatus = service.CreateOrder(model);
@@ -178,6 +181,13 @@ namespace GraceCareCenterOrder.Controllers
                 return View(model);
             }
 
+            string errorFound = EditItems(model.OrderDetailCategoryList);
+            if (errorFound != null)
+            {
+                ModelState.AddModelError("", errorFound);
+                return View(model);
+            }
+
             var service = CreateOrderService();
 
             OrderCrtUpdRtnStatus orderRtnStatus = service.UpdateOrder(model);
@@ -238,6 +248,37 @@ namespace GraceCareCenterOrder.Controllers
             var userId = User.Identity.GetUserId();
             var service = new OrderService(userId);
             return service;
+        }
+
+        // Edit Items in an Order
+        private string EditItems(List<OrderDetailCategory> orderDetailCategoryList)
+        {
+            foreach (var cat in orderDetailCategoryList)
+            {
+                foreach (var subCat in cat.OrderDetailSubCatList)
+                {
+                    int subCatCount = 0;
+                    int subCatMax = (subCat.SubCatMaxAllowed == 0) ? 999999999 : subCat.SubCatMaxAllowed;
+                    foreach (var itm in subCat.OrderDetailItemList)
+                    {
+                        if (itm.MaxAllowed > 0)
+                        {
+                            if (itm.Quantity > itm.MaxAllowed)
+                            {
+                                return $"Quantity selected for {itm.ItemName} is more than the maximum allowed of {itm.MaxAllowed}";
+                            }
+                        }
+                        subCatCount += itm.Quantity;
+
+                        if (subCatCount > subCatMax)
+                        {
+                            return $"Total quantity for {subCat.SubCatName} is more than the maximum allowed of {subCatMax}";
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         // Build TimeSlot Dropdown
