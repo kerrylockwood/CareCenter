@@ -104,9 +104,9 @@
                 <div style="text-indent:1.5em;">
                     @if (subCat.SubCatMaxAllowed != 0)
                     {
-                        <h4 style="color:deepskyblue;">
-                            @Html.DisplayFor(subCatItem => subCat.SubCatName)    &emsp; Max: @Html.DisplayFor(subCatItem => subCat.SubCatMaxAllowed)
-                        </h4>
+                    <h4 style="color:deepskyblue;">
+                        @Html.DisplayFor(subCatItem => subCat.SubCatName)    &emsp; Maximum Quantity for this section: @Html.DisplayFor(subCatItem => subCat.SubCatMaxAllowed)
+                    </h4>
                     }
                     @if (subCat.SubCatMaxAllowed == 0)
                     {
@@ -157,5 +157,12 @@
 </div>
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.OrderId, isCust = Model.IsCust }) |
-    @Html.ActionLink("Back to List", "Index")
+    @if (Model.IsPull)
+    {
+        @Html.ActionLink("Back to List", "PullIndex")
+    }
+    @if (!Model.IsPull)
+    {
+        @Html.ActionLink("Back to List", "Index")
+    }
 </p>

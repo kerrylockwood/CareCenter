@@ -115,9 +115,9 @@
                     }
                     if (Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed != 0)
                     {
-                        <h4 style="color:deepskyblue;">
-                            @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)    &emsp; Max: @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed)
-                        </h4>
+        <h4 style="color:deepskyblue;">
+            @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)    &emsp; Maximum Quantity for this section: @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed)
+        </h4>
                     }
                     <p hidden>
                         @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatId)

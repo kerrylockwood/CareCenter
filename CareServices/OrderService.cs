@@ -49,6 +49,35 @@ namespace CareServices
             }
         }
 
+        public IEnumerable<OrderList> GetUnpulledOrders()
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var query =
+                    ctx
+                        .OrderHeaders
+                        .Where(e => e.OrderCompletedAt == null)
+                        .Select(
+                            e =>
+                                new OrderList
+                                {
+                                    OrderId = e.OrderId,
+                                    CustId = e.CustId,
+                                    SlotId = e.SlotId,
+                                    CreateDateTime = e.CreatedAt,
+                                    //SlotDateTime cannot be populated here due to LINQ
+                                    CustFirstName = e.Customer.FirstName,
+                                    CustLastName = e.Customer.LastName,
+                                    Deliver = e.Deliver,
+                                    PullStarted = (e.PullStartedAt == null) ? false : true,
+                                    PullCompleted = (e.OrderCompletedAt == null) ? false : true
+                                }
+                        );
+
+                return query.ToArray();
+            }
+        }
+
         public OrderHeaderDetail GetOrderHeaderByCustId(int id, bool isCust)
         {
             using (var ctx = new ApplicationDbContext())

@@ -144,13 +144,14 @@ namespace GraceCareCenterOrder.Controllers
         // OrderCreate Stream - Ends here
 
         // GET: Order/Details
-        public ActionResult Details(int id)
+        public ActionResult Details(int id, bool isPull)
         {
             var userId = User.Identity.GetUserId();
 
             var orderService = CreateOrderService();
             bool isCust = false;
             var model = orderService.GetOrderWithShortDetailById(id, userId, isCust);
+            model.IsPull = isPull;
 
             return View(model);
         }
@@ -288,6 +289,24 @@ namespace GraceCareCenterOrder.Controllers
 
             return null;
         }
+
+        // Begin - Pull Order section
+        // GET: OrderPull
+        public ActionResult PullIndex()
+        {
+            var userId = User.Identity.GetUserId();
+            var service = CreateOrderService();
+            var model = service.GetUnpulledOrders();
+
+            // Get the Appointment Date/Time for each Order
+            foreach (var item in model)
+            {
+                item.SlotDateTime = service.ConvertSlotToDateTime(item.SlotId, item.CreateDateTime.DateTime, item.Deliver, userId);
+            }
+
+            return View(model);
+        }
+        // End - Pull Order section
 
         // Build TimeSlot Dropdown
         private IOrderedEnumerable<SelectListItem> BuildTimeSlotDropdown(bool deliver, int selectedValue)

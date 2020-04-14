@@ -1,7 +1,6 @@
 ﻿@{
     ViewBag.Title = "Grace Church Care Center";
 }
-
     <div class="jumbotron">
         <h1>Grace Care Center Food Pantry</h1>
         <p class="lead">Start here to create a food pantry order.</p>
@@ -20,58 +19,67 @@
         }
     </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Orders</h2>
-        <p>
-            Review Orders.
-        </p>
-        <p>
-            @Html.ActionLink("Orders", "Index", "Order", null, new { @class = "btn btn-primary btn-large" })
-        </p>
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Orders</h2>
+            <p>
+                Review Orders.
+            </p>
+            <p>
+                @Html.ActionLink("Orders", "Index", "Order", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2>Pull Orders</h2>
+            <p>
+                List of Orders to be pulled.
+            </p>
+            <p>
+                @Html.ActionLink("Orders", "PullIndex", "Order", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2>BarCodes</h2>
+            <p>
+                Review BarCodes
+            </p>
+            <p>
+                @Html.ActionLink("Bar Codes", "Index", "BarCode", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2>Categories</h2>
+            <p>Review Food Pantry Catagories.</p>
+            <p>
+                @Html.ActionLink("Categories", "Index", "Category", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2>Sub-Categories</h2>
+            <p>Review Food Pantry SubCatagories.</p>
+            <p>
+                @Html.ActionLink("Sub-Categories", "Index", "SubCat", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2>Items</h2>
+            <p>Review Food Pantry Items.</p>
+            <p>
+                @Html.ActionLink("Items", "Index", "Item", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2>Customers</h2>
+            <p>Review Food Pantry Customers.</p>
+            <p>
+                @Html.ActionLink("Customers", "Index", "Customer", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2>Pickup Time Slots</h2>
+            <p>Review Pickup Time Slots.</p>
+            <p>
+                @Html.ActionLink("Pickup Time Slots", "Index", "TimeSlot", null, new { @class = "btn btn-primary btn-large" })
+            </p>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>BarCodes</h2>
-        <p>
-            Review BarCodes
-        </p>
-        <p>
-            @Html.ActionLink("Bar Codes", "Index", "BarCode", null, new { @class = "btn btn-primary btn-large" })
-        </p>
-    </div>
-    <div class="col-md-4">
-        <h2>Categories</h2>
-        <p>Review Food Pantry Catagories.</p>
-        <p>
-            @Html.ActionLink("Categories", "Index", "Category", null, new { @class = "btn btn-primary btn-large" })
-        </p>
-    </div>
-    <div class="col-md-4">
-        <h2>Sub-Categories</h2>
-        <p>Review Food Pantry SubCatagories.</p>
-        <p>
-            @Html.ActionLink("Sub-Categories", "Index", "SubCat", null, new { @class = "btn btn-primary btn-large" })
-        </p>
-    </div>
-    <div class="col-md-4">
-        <h2>Items</h2>
-        <p>Review Food Pantry Items.</p>
-        <p>
-            @Html.ActionLink("Items", "Index", "Item", null, new { @class = "btn btn-primary btn-large" })
-        </p>
-    </div>
-    <div class="col-md-4">
-        <h2>Customers</h2>
-        <p>Review Food Pantry Customers.</p>
-        <p>
-            @Html.ActionLink("Customers", "Index", "Customer", null, new { @class = "btn btn-primary btn-large" })
-        </p>
-    </div>
-    <div class="col-md-4">
-        <h2>Pickup Time Slots</h2>
-        <p>Review Pickup Time Slots.</p>
-        <p>
-            @Html.ActionLink("Pickup Time Slots", "Index", "TimeSlot", null, new { @class = "btn btn-primary btn-large" })
-        </p>
-    </div>
-</div>
