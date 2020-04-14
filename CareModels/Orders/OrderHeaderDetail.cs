@@ -27,13 +27,16 @@ namespace CareModels.Orders
         [Display(Name = "Delivery")]
         public bool Deliver { get; set; }
 
+        [Display(Name = "Pulled Started At")]
         public DateTimeOffset? PullStartedAt { get; set; }
 
+        [Display(Name = "Pulled Started By")]
         public Guid? PullStartedBy { get; set; }
 
         [Display(Name = "Pulled By")]
         public string PullStartedName { get; set; }
 
+        [Display(Name = "Order Completed At")]
         public DateTimeOffset? OrderCompletedAt { get; set; }
 
         [Display(Name = "Most Needed Notes")]
@@ -58,6 +61,7 @@ namespace CareModels.Orders
         [Display(Name = "Created By")]
         public string CreateName { get; set; }
 
+        [Display(Name = "Created At")]
         public DateTimeOffset CreateDateTime { get; set; }
 
         public List<OrderDetailCategory> OrderDetailCategoryList { get; set; }

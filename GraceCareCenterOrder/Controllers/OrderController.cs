@@ -98,7 +98,7 @@ namespace GraceCareCenterOrder.Controllers
                 OrderDetailCategoryList = orderService.GetOrderDetailByOrderId(0, userId, shortList)
             };
 
-            ViewBag.SlotId = BuildTimeSlotDropdown(false);
+            ViewBag.SlotId = BuildTimeSlotDropdown(false, model.SlotId);
 
             return View(model);
         }
@@ -137,7 +137,7 @@ namespace GraceCareCenterOrder.Controllers
 
             ModelState.AddModelError("", "Order could not be created.");
 
-            ViewBag.TimeSlotId = BuildTimeSlotDropdown(model.Deliver);
+            ViewBag.TimeSlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
 
             return View(model);
         }
@@ -163,7 +163,7 @@ namespace GraceCareCenterOrder.Controllers
             var orderService = CreateOrderService();
             var model = orderService.GetOrderWithDetailById(id, userId, isCust);
 
-            ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver);
+            ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
 
             return View(model);
         }
@@ -253,6 +253,8 @@ namespace GraceCareCenterOrder.Controllers
         // Edit Items in an Order
         private string EditItems(List<OrderDetailCategory> orderDetailCategoryList)
         {
+            double pointsUsed = 0;
+            int maxPointsAllowed = 25;
             foreach (var cat in orderDetailCategoryList)
             {
                 foreach (var subCat in cat.OrderDetailSubCatList)
@@ -274,20 +276,26 @@ namespace GraceCareCenterOrder.Controllers
                         {
                             return $"Total quantity for {subCat.SubCatName} is more than the maximum allowed of {subCatMax}";
                         }
+
+                        pointsUsed += itm.Quantity * itm.PointCost;
                     }
                 }
+            }
+            if (pointsUsed > maxPointsAllowed)
+            {
+                return $"{pointsUsed} points worth of items were selected, but only {maxPointsAllowed} points are available.  Please reduce some quantities.";
             }
 
             return null;
         }
 
         // Build TimeSlot Dropdown
-        private IOrderedEnumerable<SelectListItem> BuildTimeSlotDropdown(bool deliver)
+        private IOrderedEnumerable<SelectListItem> BuildTimeSlotDropdown(bool deliver, int selectedValue)
         {
             var userId = User.Identity.GetUserId();
             var timeSlotService = new TimeSlotService(userId);
 
-            var timeSlotList = new SelectList(timeSlotService.GetTimeSlotDropDown(deliver), "SlotId", "SlotTime");
+            var timeSlotList = new SelectList(timeSlotService.GetTimeSlotDropDown(deliver), "SlotId", "SlotTime", selectedValue);
             var sortedTimeSlotList = timeSlotList.OrderBy(o => o.Text);
 
             return sortedTimeSlotList;

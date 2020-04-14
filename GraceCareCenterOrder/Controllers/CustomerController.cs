@@ -90,20 +90,17 @@ namespace GraceCareCenterOrder.Controllers
             return View(model);
         }
 
-        //public ActionResult Create()
-        //{
-        //    ViewBag.BarCodeId = BuildBarCodeDropdown(0);
-
-        //    return View();
-        //}
-
         // POST: Customer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(CustCreate model)
         {
             int newCustId = 0;
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
+                return View(model);
+            }
 
             var service = CreateCustomerService();
 
@@ -124,7 +121,7 @@ namespace GraceCareCenterOrder.Controllers
                     // Creating a New Customer
                     ModelState.AddModelError("", $"BarCode cannot be 0.");
 
-                    ViewBag.BarCodeId = BuildBarCodeDropdown(0);
+                    ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
 
                     return View(model);
                 }
@@ -135,11 +132,11 @@ namespace GraceCareCenterOrder.Controllers
             if (!model.IsOrder)
             {
                 // This is NOT an order, must validate that Barcode does not exist
-                if (existingCustDetail.BarCodeId != null)
+                if (existingCustDetail.BarCodeId != null && existingCustDetail.BarCodeId != 0)
                 {
                     ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
 
-                    ViewBag.BarCodeId = BuildBarCodeDropdown(0);
+                    ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
 
                     return View(model);
                 }
@@ -158,7 +155,7 @@ namespace GraceCareCenterOrder.Controllers
 
             ModelState.AddModelError("", $"'{model.FirstName} {model.LastName}' could not be created.");
 
-            ViewBag.BarCodeId = BuildBarCodeDropdown(0);
+            ViewBag.BarCodeId = BuildBarCodeDropdown(model.BarCodeId);
 
             return View(model);
         }
@@ -198,12 +195,21 @@ namespace GraceCareCenterOrder.Controllers
             var userId = User.Identity.GetUserId();
             var barCodeService = new BarCodeService(userId);
 
-            // BarCodeId cannot be null to get here
-            var barCodeDetail = barCodeService.GetBarCodeById((int)model.BarCodeId);
+            // BarCodeId is null here if created by a Customer using Barcode Number of 0
+            int barCodeIdParm = 0;
+            if (detail.BarCodeId == null)
+            {
+                barCodeIdParm = 0;
+                model.BarCodeNumber = 0;
+            }
+            else
+            {
+                barCodeIdParm = (int)model.BarCodeId;
+                var barCodeDetail = barCodeService.GetBarCodeById(barCodeIdParm);
+                model.BarCodeNumber = barCodeDetail.BarCodeNumber;
+            }
 
-            model.BarCodeNumber = barCodeDetail.BarCodeNumber;
-
-            ViewBag.BarCodeId = BuildBarCodeDropdown((int)detail.BarCodeId);
+            ViewBag.BarCodeId = BuildBarCodeDropdown(barCodeIdParm);
 
             return View(model);
         }
@@ -213,18 +219,26 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, CustUpdate model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.BarCodeId = BuildBarCodeDropdown((int)model.BarCodeId);
+                return View(model);
+            }
 
             if (model.CustomerId != id)
             {
                 ModelState.AddModelError("", "Id Mismatch");
+                ViewBag.BarCodeId = BuildBarCodeDropdown((int)model.BarCodeId);
                 return View(model);
             }
 
             var service = CreateCustomerService();
 
-            CustDetail existingCustDetail = service.GetCustByBarCodeId((int)model.BarCodeId);
-            if (existingCustDetail != null && existingCustDetail.CustomerId != id)
+            int barCodeIdParm = 0;
+            if (model.BarCodeId != null) { barCodeIdParm = (int)model.BarCodeId; }
+
+            CustDetail existingCustDetail = service.GetCustByBarCodeId(barCodeIdParm);
+            if (existingCustDetail.BarCodeNumber != 0 && existingCustDetail.CustomerId != id)
             {
                 ModelState.AddModelError("", $"BarCode '{existingCustDetail.BarCodeNumber}' is already assigned to {existingCustDetail.FirstName} {existingCustDetail.LastName}.");
 

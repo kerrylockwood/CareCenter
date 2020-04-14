@@ -34,7 +34,18 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(SlotCreate model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid) 
+            {
+                ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
+                return View(model); 
+            }
+
+            if (TimeSpan.Compare(model.Time, TimeSpan.Zero) < 0 || TimeSpan.Compare(model.Time, new TimeSpan(23,59,59)) > 0)
+            {
+                ModelState.AddModelError("", "Please enter Time using a 24-hour clock in the format HH:MM");
+                ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
+                return View(model);
+            }
 
             var service = CreateTimeSlotService();
 
@@ -45,7 +56,7 @@ namespace GraceCareCenterOrder.Controllers
             };
 
             ModelState.AddModelError("", $"'{model.DayOfWeekNum.ToString()} at {model.Time}' could not be created.");
-
+            ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
             return View(model);
         }
 
@@ -82,11 +93,23 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, SlotUpdate model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
+                return View(model);
+            }
+
+            if (TimeSpan.Compare(model.Time, TimeSpan.Zero) < 0 || TimeSpan.Compare(model.Time, new TimeSpan(23, 59, 59)) > 0)
+            {
+                ModelState.AddModelError("", "Please enter Time using a 24-hour clock in the format HH:MM");
+                ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
+                return View(model);
+            }
 
             if (model.SlotId != id)
             {
                 ModelState.AddModelError("", "Id Mismatch");
+                ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
                 return View(model);
             }
 
@@ -99,6 +122,7 @@ namespace GraceCareCenterOrder.Controllers
             }
 
             ModelState.AddModelError("", $"'{model.DayOfWeekNum.ToString()} at {model.Time}' could not be updated.");
+            ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
             return View(model);
         }
 

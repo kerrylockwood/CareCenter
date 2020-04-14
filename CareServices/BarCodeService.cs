@@ -46,16 +46,34 @@ namespace CareServices
                                 new BarCodeList
                                 {
                                     BarCodeId = e.BarCodeId,
-                                    BarCodeNumber = e.BarCodeNumber,
+                                    BarCodeNumber = e.BarCodeNumber
                                 }
                         );
+                BarCodeList newBarCode = new BarCodeList
+                {
+                    BarCodeId = 0,
+                    BarCodeNumber = 0,
+                };
+                List<BarCodeList> queryList = query.ToList();
 
-                return query.ToArray();
+                //return query.ToArray();
+                return queryList.ToArray();
             }
         }
 
         public BarCodeDetail GetBarCodeById(int barCodeId)
         {
+            if (barCodeId == 0)
+            {
+                return
+                    new BarCodeDetail
+                    {
+                        BarCodeId = 0,
+                        //BarCodeNumber = 0,
+                        //CreateAt = DateTimeOffset.Now,
+                        //CreateName = null
+                    };
+            }
             using (var ctx = new ApplicationDbContext())
             {
                 var entity =
@@ -84,9 +102,9 @@ namespace CareServices
                     new BarCodeDetail
                     {
                         BarCodeId = 0,
-                        BarCodeNumber = 0,
-                        CreateAt = null,
-                        CreateName = null
+                        //BarCodeNumber = 0,
+                        //CreateAt = null,
+                        //CreateName = null
                     };
                 }
                 var entity =

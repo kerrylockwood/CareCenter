@@ -29,7 +29,7 @@ namespace CareModels.Orders
         [Display(Name = "Pull Started")]
         public bool PullStarted { get; set; }
 
-        [Display(Name = "Pull Completed")]
+        [Display(Name = "Order Completed")]
         public bool PullCompleted { get; set; }
 
         public DateTimeOffset CreateDateTime { get; set; }

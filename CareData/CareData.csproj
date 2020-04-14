@@ -119,21 +119,9 @@
     <Compile Include="Migrations\202004071244065_Mods.Designer.cs">
       <DependentUpon>202004071244065_Mods.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202004072018148_RenameField.cs" />
-    <Compile Include="Migrations\202004072018148_RenameField.Designer.cs">
-      <DependentUpon>202004072018148_RenameField.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004082117106_RemoveRequiredFromBarCodeInCustomer.cs" />
-    <Compile Include="Migrations\202004082117106_RemoveRequiredFromBarCodeInCustomer.Designer.cs">
-      <DependentUpon>202004082117106_RemoveRequiredFromBarCodeInCustomer.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\202004082138427_RemoveRequiredFromBarCodeInCustomer2.cs" />
     <Compile Include="Migrations\202004082138427_RemoveRequiredFromBarCodeInCustomer2.Designer.cs">
       <DependentUpon>202004082138427_RemoveRequiredFromBarCodeInCustomer2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004082200031_RemoveRequiredFromBarCodeInCustomer3.cs" />
-    <Compile Include="Migrations\202004082200031_RemoveRequiredFromBarCodeInCustomer3.Designer.cs">
-      <DependentUpon>202004082200031_RemoveRequiredFromBarCodeInCustomer3.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OrderDetail.cs" />
@@ -192,17 +180,8 @@
     <EmbeddedResource Include="Migrations\202004071244065_Mods.resx">
       <DependentUpon>202004071244065_Mods.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004072018148_RenameField.resx">
-      <DependentUpon>202004072018148_RenameField.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004082117106_RemoveRequiredFromBarCodeInCustomer.resx">
-      <DependentUpon>202004082117106_RemoveRequiredFromBarCodeInCustomer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004082138427_RemoveRequiredFromBarCodeInCustomer2.resx">
       <DependentUpon>202004082138427_RemoveRequiredFromBarCodeInCustomer2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004082200031_RemoveRequiredFromBarCodeInCustomer3.resx">
-      <DependentUpon>202004082200031_RemoveRequiredFromBarCodeInCustomer3.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
