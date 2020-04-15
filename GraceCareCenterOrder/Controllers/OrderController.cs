@@ -108,7 +108,11 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(OrderCreate model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.TimeSlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
+                return View(model);
+            }
 
             string errorFound = EditItems(model.OrderDetailCategoryList);
             if (errorFound != null) return View(model);
