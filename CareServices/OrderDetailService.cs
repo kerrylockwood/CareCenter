@@ -167,7 +167,11 @@ namespace CareServices
                 entity.Quantity = model.Quantity;
                 entity.Filled = model.Filled;
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 

@@ -153,11 +153,7 @@ namespace GraceCareCenterOrder.Controllers
             var model = orderService.GetOrderWithShortDetailById(id, userId, isCust);
             model.IsPull = isPull;
             model.IsFromPull = isFromPull;
-            if (isFromPull && model.PullStartedAt != null && model.PullStartedBy != userId)
-            {
-                return RedirectToAction(actionName: "TakeOverPull", controllerName: "Order", routeValues: new { orderId = id });
-            }
-
+          
             return View(model);
         }
 
@@ -327,13 +323,13 @@ namespace GraceCareCenterOrder.Controllers
             var userId = User.Identity.GetUserId();
             if (orderToComplete.PullStartedAt != null && orderToComplete.PullStartedBy != userId)
             {
-                return RedirectToAction(actionName: "TakeOverPull", controllerName: "Order", routeValues: new { id = orderId });
+                return RedirectToAction(actionName: "TakeOverPull", controllerName: "Order", routeValues: new { OrderId = orderId });
             }
 
             bool orderPullStarted = service.StartPullOrder(orderId);
             if (orderPullStarted)
             {
-                return RedirectToAction(actionName: "Details", controllerName: "Order", routeValues: new { id = orderId, isFromPull = true, isPull = true });
+                return RedirectToAction(actionName: "PullOrder", controllerName: "Order", routeValues: new { id = orderId });
             }
 
             ModelState.AddModelError("", "Order Pull could not be started - unknown reason.");
@@ -363,6 +359,7 @@ namespace GraceCareCenterOrder.Controllers
                 return View(model);
             }
 
+
             if (model.OrderId != orderId)
             {
                 ModelState.AddModelError("", "Error in changing Pull User Name.  Please try again.");
@@ -375,11 +372,73 @@ namespace GraceCareCenterOrder.Controllers
             bool takeOverSucess = service.TakeOverOrder(orderId, userId);
             if (takeOverSucess)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(actionName: "PullOrder", controllerName: "Order", routeValues: new { id = orderId });
             }
 
             ModelState.AddModelError("", "Error in changing Pull User Name - unknown error.  Please try again.");
             return View(model);
+        }
+
+
+        // GET: Order/PullOrder
+        public ActionResult PullOrder(int id)
+        {
+            var userId = User.Identity.GetUserId();
+
+            var orderService = CreateOrderService();
+            bool isCust = false;
+            var model = orderService.GetOrderWithShortDetailById(id, userId, isCust);
+
+            return View(model);
+        }
+
+        // GET: Order/PullOrder
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult PullOrder(int id, OrderHeaderDetail model)
+        {
+            bool isComplete = false;
+            if (Request.Form["Complete"] != null) { isComplete = true; }
+            else if (Request.Form["PullOnly"] != null) { isComplete = false; }
+            else
+            {
+                ModelState.AddModelError("", "Programmer Error - Could not identify Button selected.");
+                return RedirectToAction("PullIndex");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (model.OrderId != id)
+            {
+                ModelState.AddModelError("", "Id Mismatch");
+                return View(model);
+            }
+
+            var service = CreateOrderService();
+
+            OrderCrtUpdRtnStatus orderRtnStatus = service.UpdatePulledItems(model, id, isComplete);
+            if (orderRtnStatus.OrderHeaderCreated)
+            {
+                if (isComplete)
+                {
+                    TempData["SaveResult"] = $"Order was Completed.";
+
+                    return RedirectToAction("PullIndex");
+                }
+                if (orderRtnStatus.OrderAllDetailCreated)
+                {
+                    TempData["SaveResult"] = $"Order was NOT completed - not all Items were updated. Please review the order.";
+                    return RedirectToAction("PullIndex");
+                }
+                TempData["SaveResult"] = $"Order was NOT completed. Some or all Pulled Items were saved.";
+                return RedirectToAction("PullIndex");
+            }
+
+            ModelState.AddModelError("", "Order could not be updated. Please review the order.");
+            return RedirectToAction("PullIndex");
         }
 
         // GET: Order/Complete

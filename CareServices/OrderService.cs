@@ -473,7 +473,7 @@ namespace CareServices
             return orderRtnStatus;
         }
 
-        public OrderCrtUpdRtnStatus UpdatePulledItems(OrderUpdate model, int orderId, bool isComplete)
+        public OrderCrtUpdRtnStatus UpdatePulledItems(OrderHeaderDetail model, int orderId, bool isComplete)
         {
             OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
             {
@@ -512,50 +512,23 @@ namespace CareServices
                     {
                         foreach (var itm in subCat.OrderDetailItemList)
                         {
-                            //if (itm.Quantity != itm.QuantityBefore)
-                            //{
-                            if (itm.pulled)
+                            if (itm.Pulled != itm.PulledBefore)
                             {
-                                // Quantity changed
+                                // Marked as Pulled (or un-Pulled)
                                 var orderDetail =
                                         new OrderDetailUpdate()
                                         {
                                             OrderDetailId = itm.OrderDetailId,
                                             ItemId = itm.ItemId,
                                             Quantity = itm.Quantity,
-                                            Filled = false
+                                            Filled = itm.Pulled
                                         };
 
-                                    if (!orderDetailService.UpdateOrderDetail(orderDetail))
-                                    {
-                                        orderRtnStatus.OrderAllDetailCreated = false;
-                                    }
+                                if (!orderDetailService.UpdateOrderDetail(orderDetail))
+                                {
+                                    orderRtnStatus.OrderAllDetailCreated = false;
                                 }
-                            //    else if (itm.Quantity > 0)
-                            //    {
-                            //        // Add Detail
-                            //        var orderDetail =
-                            //            new OrderDetailCreate()
-                            //            {
-                            //                OrderId = orderRtnStatus.OrderId,
-                            //                ItemId = itm.ItemId,
-                            //                Quantity = itm.Quantity,
-                            //                Filled = false
-                            //            };
-
-                            //        if (!orderDetailService.CreateOrderDetail(orderDetail))
-                            //        {
-                            //            orderRtnStatus.OrderAllDetailCreated = false;
-                            //        }
-                            //    }
-                            //    else if (itm.QuantityBefore > 0)
-                            //    {
-                            //        if (!orderDetailService.DeleteOrderDetail(itm.OrderDetailId))
-                            //        {
-                            //            orderRtnStatus.OrderAllDetailCreated = false;
-                            //        }
-                            //    }
-                            //}
+                            }
                         }
                     }
                 }
