@@ -31,5 +31,9 @@ namespace CareModels.Orders
         [Display(Name = "Quantity Requested")]
         public int Quantity { get; set; }
         public int QuantityBefore { get; set; }
+
+        [Display(Name = "Item Pulled")]
+        public bool Pulled { get; set; }
+        public bool PulledBefore { get; set; }
     }
 }

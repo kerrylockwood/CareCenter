@@ -66,7 +66,9 @@ namespace CareServices
                         MaxAllowed = 0,
                         PointCost = 0.0,
                         Quantity = 0,
-                        QuantityBefore = 0
+                        QuantityBefore = 0,
+                        Pulled = false,
+                        PulledBefore = false
                     };
                 }
                 var entity =
@@ -84,7 +86,9 @@ namespace CareServices
                         MaxAllowed = entity.Item.MaxAllowed,
                         PointCost = entity.Item.PointCost,
                         Quantity = entity.Quantity,
-                        QuantityBefore = entity.Quantity
+                        QuantityBefore = entity.Quantity,
+                        Pulled = entity.Filled,
+                        PulledBefore = entity.Filled
                     };
             }
         }
@@ -107,7 +111,9 @@ namespace CareServices
                         MaxAllowed = 0,
                         PointCost = 0.0,
                         Quantity = 0,
-                        QuantityBefore = 0
+                        QuantityBefore = 0,
+                        Pulled = false,
+                        PulledBefore = false
                     };
                 }
                 var entity =
@@ -125,7 +131,9 @@ namespace CareServices
                         MaxAllowed = entity.Item.MaxAllowed,
                         PointCost = entity.Item.PointCost,
                         Quantity = entity.Quantity,
-                        QuantityBefore = entity.Quantity
+                        QuantityBefore = entity.Quantity,
+                        Pulled = entity.Filled,
+                        PulledBefore = entity.Filled
                     };
             }
         }

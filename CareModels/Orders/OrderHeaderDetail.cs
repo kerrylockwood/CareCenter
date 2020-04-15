@@ -14,6 +14,7 @@ namespace CareModels.Orders
         public int CustId { get; set; }
         public int SlotId { get; set; }
         public bool IsCust { get; set; }
+        public bool IsFromPull { get; set; }
         public bool IsPull { get; set; }
 
         [Display(Name = "Pickup Date/Time")]
@@ -32,7 +33,7 @@ namespace CareModels.Orders
         public DateTimeOffset? PullStartedAt { get; set; }
 
         [Display(Name = "Pulled Started By")]
-        public Guid? PullStartedBy { get; set; }
+        public string PullStartedBy { get; set; }
 
         [Display(Name = "Pulled By")]
         public string PullStartedName { get; set; }

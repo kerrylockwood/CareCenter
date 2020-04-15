@@ -5,10 +5,16 @@
 }
 
 <h2>Pull Orders</h2>
-
-@*<p>
-        @Html.ActionLink("Create New", "Create")
-    </p>*@
+@if (TempData.ContainsKey("SaveResult"))
+{
+    <div class="Alert alert-success fade in" role="alert">
+        @ViewBag.SaveResult
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+        @TempData["SaveResult"]
+    </div>
+}
 <table class="table">
     <tr>
         <th>
@@ -50,37 +56,31 @@
                 @Html.DisplayFor(modelItem => item.PullStarted)
             </td>
             <td>
-                @*@Html.ActionLink("Details", "Details", new { id = item.OrderId, isPull = true }) |
-                    @Html.ActionLink("Start_Pull", "StartPull", new { id = item.OrderId }) |
-                    @Html.ActionLink("Complete_Order", "Complete", new { id = item.OrderId })*@
-                @Html.ActionLink("Details", "Details", "Order", new { id = item.OrderId, isPull = true }, new { @class = "btn btn-primary btn-large" })
-                @Html.ActionLink("Start Pull", "StartPull", "Order", new { id = item.OrderId }, new { @class = "btn btn-success btn-large" })
-                <a class="btn btn-primary" data-toggle="modal" data-target=".bootstrapmodal"> Complete Order </a>
+                @Html.ActionLink("Details", "Details", "Order", new { id = item.OrderId, isFromPull = true, isPull = false }, new { @class = "btn btn-primary btn-large" })
+                @Html.ActionLink("Start Pull", "StartPull", "Order", new { orderId = item.OrderId }, new { @class = "btn btn-success btn-large" })
                 @*@Html.ActionLink("Complete Order", "Complete", "Order", new { id = item.OrderId }, new { @class = "btn btn-primary btn-large" })*@
-            </td>
-        </tr>
+                <a class="btn btn-primary" data-toggle="modal" data-target=".bootstrapmodal"> Complete Order </a>
 
-        <div class="modal fade bootstrapmodal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button data-dismiss="modal" class="close"> <span>&times;</span></button>
-                        <div class="modal-title"> Complete Order</div>
-                    </div>
-                    <div class="modal-body">
-                        <h4>
-                            Are you sure you want to complete this order?
-                        </h4>
-                    </div>
-                    <div class="modal-footer">
-                        @*<button class="btn btn-primary"> Complete Order </button>*@
-                        @Html.ActionLink("Complete Order", "Complete", "Order", new { id = item.OrderId }, new { @class = "btn btn-primary btn-large" })
-                        <button class="btn btn-primary" data-dismiss="modal"> Cancel </button>
+                <div class="modal fade bootstrapmodal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button data-dismiss="modal" class="close"> <span>&times;</span></button>
+                                <div class="modal-title"> Complete Order</div>
+                            </div>
+                            <div class="modal-body">
+                                <h4>
+                                    Are you sure you want to complete this order?
+                                </h4>
+                            </div>
+                            <div class="modal-footer">
+                                @Html.ActionLink("Complete Order", "Complete", "Order", new { id = item.OrderId }, new { @class = "btn btn-primary btn-large" })
+                                <button class="btn btn-primary" data-dismiss="modal"> Cancel </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
+            </td>
+        </tr>
     }
-
 </table>

@@ -144,7 +144,7 @@ namespace GraceCareCenterOrder.Controllers
         // OrderCreate Stream - Ends here
 
         // GET: Order/Details
-        public ActionResult Details(int id, bool isPull)
+        public ActionResult Details(int id, bool isFromPull, bool isPull)
         {
             var userId = User.Identity.GetUserId();
 
@@ -152,9 +152,15 @@ namespace GraceCareCenterOrder.Controllers
             bool isCust = false;
             var model = orderService.GetOrderWithShortDetailById(id, userId, isCust);
             model.IsPull = isPull;
+            model.IsFromPull = isFromPull;
+            if (isFromPull && model.PullStartedAt != null && model.PullStartedBy != userId)
+            {
+                return RedirectToAction(actionName: "TakeOverPull", controllerName: "Order", routeValues: new { orderId = id });
+            }
 
             return View(model);
         }
+
 
         // GET: Order/Update
         public ActionResult Edit(int id, bool isCust)
@@ -174,11 +180,16 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, OrderUpdate model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
+                return View(model);
+            }
 
             if (model.OrderId != id)
             {
                 ModelState.AddModelError("", "Id Mismatch");
+                ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
                 return View(model);
             }
 
@@ -186,6 +197,7 @@ namespace GraceCareCenterOrder.Controllers
             if (errorFound != null)
             {
                 ModelState.AddModelError("", errorFound);
+                ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
                 return View(model);
             }
 
@@ -212,7 +224,7 @@ namespace GraceCareCenterOrder.Controllers
             }
 
             ModelState.AddModelError("", "Order could not be updated.");
-
+            ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
             return View(model);
         }
 
@@ -241,14 +253,6 @@ namespace GraceCareCenterOrder.Controllers
             TempData["SaveResult"] = $"Order was deleted";
 
             return RedirectToAction("Index");
-        }
-
-        // Create Order Service
-        private OrderService CreateOrderService()
-        {
-            var userId = User.Identity.GetUserId();
-            var service = new OrderService(userId);
-            return service;
         }
 
         // Edit Items in an Order
@@ -306,7 +310,112 @@ namespace GraceCareCenterOrder.Controllers
 
             return View(model);
         }
+
+        // GET: Order/StartPull
+        public ActionResult StartPull(int orderId)
+        {
+            var service = CreateOrderService();
+
+            bool isCust = false;
+            var orderToComplete = service.GetOrderById(orderId, isCust);
+            if (orderToComplete.OrderCompletedAt != null)
+            {
+                TempData["SaveResult"] = $"Order was completed at {orderToComplete.OrderCompletedAt}.";
+                return RedirectToAction("PullIndex");
+            }
+
+            var userId = User.Identity.GetUserId();
+            if (orderToComplete.PullStartedAt != null && orderToComplete.PullStartedBy != userId)
+            {
+                return RedirectToAction(actionName: "TakeOverPull", controllerName: "Order", routeValues: new { id = orderId });
+            }
+
+            bool orderPullStarted = service.StartPullOrder(orderId);
+            if (orderPullStarted)
+            {
+                return RedirectToAction(actionName: "Details", controllerName: "Order", routeValues: new { id = orderId, isFromPull = true, isPull = true });
+            }
+
+            ModelState.AddModelError("", "Order Pull could not be started - unknown reason.");
+
+            return RedirectToAction("PullIndex");
+        }
+
+        // GET: Order/TakeOverPull
+        public ActionResult TakeOverPull(int orderId)
+        {
+            var userId = User.Identity.GetUserId();
+
+            var orderService = CreateOrderService();
+            bool isCust = false;
+            var model = orderService.GetOrderById(orderId, isCust);
+
+            return View(model);
+        }
+
+        // GET: Order/TakeOverPull
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult TakeOverPull(int orderId, OrderHeaderDetail model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (model.OrderId != orderId)
+            {
+                ModelState.AddModelError("", "Error in changing Pull User Name.  Please try again.");
+                return View(model);
+            }
+
+            var userId = User.Identity.GetUserId();
+            var service = CreateOrderService();
+
+            bool takeOverSucess = service.TakeOverOrder(orderId, userId);
+            if (takeOverSucess)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.AddModelError("", "Error in changing Pull User Name - unknown error.  Please try again.");
+            return View(model);
+        }
+
+        // GET: Order/Complete
+        public ActionResult Complete(int id)
+        {
+            var service = CreateOrderService();
+
+            bool isCust = false;
+            var orderToComplete = service.GetOrderById(id, isCust);
+            if (orderToComplete.OrderCompletedAt != null)
+            {
+                TempData["SaveResult"] = $"Order was completed at {orderToComplete.OrderCompletedAt}.";
+                return RedirectToAction("PullIndex");
+            }
+
+            bool orderCompleted = service.CompleteOrder(id);
+            if (orderCompleted)
+            {
+                TempData["SaveResult"] = $"Order for {orderToComplete.CustFirstName} {orderToComplete.CustLastName} was Completed.";
+            }
+            else
+            {
+                ModelState.AddModelError("", "Order could not be completed - unknown reason.");
+            }
+
+            return RedirectToAction("PullIndex");
+        }
         // End - Pull Order section
+
+        // Create Order Service
+        private OrderService CreateOrderService()
+        {
+            var userId = User.Identity.GetUserId();
+            var service = new OrderService(userId);
+            return service;
+        }
 
         // Build TimeSlot Dropdown
         private IOrderedEnumerable<SelectListItem> BuildTimeSlotDropdown(bool deliver, int selectedValue)

@@ -42,14 +42,17 @@ namespace CareData
         public string CreateBy { get; set; }
         public virtual ApplicationUser User { get; set; }
 
-        [ForeignKey(nameof(PullStartedUser))]
+        //[ForeignKey(nameof(PullStartedUser))]
         public string PullStartedName { get; set; }
-        public virtual ApplicationUser PullStartedUser { get; set; }
+        //public virtual ApplicationUser PullStartedUser { get; set; }
 
         [Required]
         public DateTimeOffset CreatedAt { get; set; }
 
-        public Guid? PullStartedBy { get; set; }
+        //[ForeignKey("ApplicationUser")]
+        [ForeignKey(nameof(PullStartedUser))]
+        public string PullStartedBy { get; set; }
+        public virtual ApplicationUser PullStartedUser { get; set; }
 
         public DateTimeOffset? PullStartedAt { get; set; }
 
