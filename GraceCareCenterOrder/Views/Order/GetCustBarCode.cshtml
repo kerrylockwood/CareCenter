@@ -36,15 +36,13 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Continue with Order" class="btn btn-default" />
+                <input type="submit" value="Continue with Order" class="btn btn-primary" />
+                @if (Model.IsCust)
+                {
+                    @Html.ActionLink("Back to Home", "Index", "Home", null, htmlAttributes: new { @class = "btn btn-primary btn-primary" })
+                }
             </div>
         </div>
-    </div>
-}
-@if (Model.IsCust)
-{
-    <div>
-        @Html.ActionLink("Back to Home", "Index", "Home")
     </div>
 }
 @if (!Model.IsCust)

@@ -155,7 +155,10 @@
                                         @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].Quantity)
                                     </td>
                                     <td>
+                                        @if(Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed > 0)
+                                        {
                                         @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
+                                        }
                                     </td>
                                     <td hidden>
                                         @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].OrderDetailId)
