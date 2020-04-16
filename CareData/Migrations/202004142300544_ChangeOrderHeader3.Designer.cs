@@ -7,13 +7,13 @@ namespace CareData.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class RenameField : IMigrationMetadata
+    public sealed partial class ChangeOrderHeader3 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(RenameField));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangeOrderHeader3));
         
         string IMigrationMetadata.Id
         {
-            get { return "202004072018148_RenameField"; }
+            get { return "202004142300544_ChangeOrderHeader3"; }
         }
         
         string IMigrationMetadata.Source

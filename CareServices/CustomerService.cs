@@ -196,7 +196,11 @@ namespace CareServices
 
                 ctx.Customers.Remove(entity);
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
     }

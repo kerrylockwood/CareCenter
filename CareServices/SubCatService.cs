@@ -118,7 +118,12 @@ namespace CareServices
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.SubCategories.Add(entity);
-                return ctx.SaveChanges() == 1;
+
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -134,7 +139,11 @@ namespace CareServices
                 entity.SubCatName = model.SubCatName;
                 entity.SubCatMaxAllowed = model.SubCatMaxAllowed;
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -149,7 +158,11 @@ namespace CareServices
 
                 ctx.SubCategories.Remove(entity);
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
     }

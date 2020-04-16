@@ -145,9 +145,9 @@
                 <div style="text-indent:1.5em;">
                     @if (subCat.SubCatMaxAllowed != 0)
                     {
-                        <h4 style="color:deepskyblue;">
-                            @Html.DisplayFor(subCatItem => subCat.SubCatName)    &emsp; Max: @Html.DisplayFor(subCatItem => subCat.SubCatMaxAllowed)
-                        </h4>
+                    <h4 style="color:deepskyblue;">
+                        @Html.DisplayFor(subCatItem => subCat.SubCatName)    &emsp; Maximum Quantity for this section: @Html.DisplayFor(subCatItem => subCat.SubCatMaxAllowed)
+                    </h4>
                     }
                     @if (subCat.SubCatMaxAllowed == 0)
                     {

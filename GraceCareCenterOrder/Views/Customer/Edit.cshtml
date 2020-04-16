@@ -112,11 +112,22 @@
         </div>
     </div>
 
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Save" class="btn btn-default" />
+    @if (Model.IsOrder)
+    {
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save and continue to Order" class="btn btn-default" />
+            </div>
         </div>
-    </div>
+    }
+    @if (!Model.IsOrder)
+    {
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    }
 </div>
 }
 
@@ -124,9 +135,6 @@
 {
     <div>
         @Html.ActionLink(linkText: "Back to BarCode Entry", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true }, htmlAttributes: new { })
-        @*@Html.ActionLink(linkText: "Back to BarCode Entry", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true })*@
-        @*@Html.ActionLink(linkText: "Create New", actionName: "Create", routeValues: new { isOrder = false, barCodeId = 0 })*@
-        @*@Html.ActionLink(linkText: "Create Order", actionName: "GetCustBarCode", controllerName: "Order", routeValues: new { isCust = true }, htmlAttributes: new { @class = "btn btn-primary btn-large" })*@
     </div>
 }
 

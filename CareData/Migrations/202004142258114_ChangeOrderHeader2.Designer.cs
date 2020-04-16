@@ -7,13 +7,13 @@ namespace CareData.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class RemoveRequiredFromBarCodeInCustomer3 : IMigrationMetadata
+    public sealed partial class ChangeOrderHeader2 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(RemoveRequiredFromBarCodeInCustomer3));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangeOrderHeader2));
         
         string IMigrationMetadata.Id
         {
-            get { return "202004082200031_RemoveRequiredFromBarCodeInCustomer3"; }
+            get { return "202004142258114_ChangeOrderHeader2"; }
         }
         
         string IMigrationMetadata.Source

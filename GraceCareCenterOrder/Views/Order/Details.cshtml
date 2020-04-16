@@ -4,15 +4,16 @@
     ViewBag.Title = "Details";
 }
 
-    <h2>Orders</h2>
+<h2>Orders</h2>
 
 <div>
     <h4>Order Details</h4>
     <hr />
     <dl class="dl-horizontal">
-            @Html.HiddenFor(model => model.OrderId)
-            @Html.HiddenFor(model => model.CustId)
-            @Html.HiddenFor(model => model.SlotId)
+        @Html.HiddenFor(model => model.OrderId)
+        @Html.HiddenFor(model => model.CustId)
+        @Html.HiddenFor(model => model.SlotId)
+        @Html.HiddenFor(model => model.PullStartedBy)
 
         <dt>
             @Html.DisplayNameFor(model => model.SlotDateTime)
@@ -52,14 +53,6 @@
 
         <dd>
             @Html.DisplayFor(model => model.PullStartedAt)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.PullStartedBy)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.PullStartedBy)
         </dd>
 
         <dt>
@@ -105,7 +98,7 @@
                     @if (subCat.SubCatMaxAllowed != 0)
                     {
                         <h4 style="color:deepskyblue;">
-                            @Html.DisplayFor(subCatItem => subCat.SubCatName)    &emsp; Max: @Html.DisplayFor(subCatItem => subCat.SubCatMaxAllowed)
+                            @Html.DisplayFor(subCatItem => subCat.SubCatName)    &emsp; Maximum Quantity for this section: @Html.DisplayFor(subCatItem => subCat.SubCatMaxAllowed)
                         </h4>
                     }
                     @if (subCat.SubCatMaxAllowed == 0)
@@ -143,9 +136,15 @@
                                         @Html.DisplayFor(itmItem => itm.Quantity)
                                     </td>
                                     <td>
-                                        @if (itm.MaxAllowed != 0)
-                                        {@Html.DisplayFor(itmItem => itm.MaxAllowed)}
-                                    </td>
+                                        @if (Model.IsPull)
+                                        {
+                                        }
+                                        @if (Model.IsPull)
+                                        {
+                                            if (itm.MaxAllowed != 0)
+                                            {@Html.DisplayFor(itmItem => itm.MaxAllowed)}
+                                        }
+                                        </td>
                                 </tr>
                             }
                         </table>
@@ -155,7 +154,23 @@
         </div>
     }
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.OrderId, isCust = Model.IsCust }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+    @if (Model.IsPull)
+    {
+        @Html.ActionLink("Complete Order", "UpdatePulledItems", "Order", new { id = Model.OrderId, isComplete = true }, new { @class = "btn btn-primary btn-large" })
+        @Html.ActionLink("Update Pull-Leave Order Open", "UpdatePulledItems", "Order", new { id = Model.OrderId, isComplete = false }, new { @class = "btn btn-primary btn-large" })
+        @Html.ActionLink("Cancel", "PullIndex", "Order", null, new { @class = "btn btn-primary btn-large" })
+    }
+    @if (!Model.IsPull)
+    {
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.OrderId, isCust = Model.IsCust }) |
+        @if (Model.IsFromPull)
+        {
+            @Html.ActionLink("Back to List", "PullIndex")
+        }
+        @if (!Model.IsFromPull)
+        {
+            @Html.ActionLink("Back to List", "Index")
+        }
+    </p>
+}

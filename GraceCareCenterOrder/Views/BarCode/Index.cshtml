@@ -29,6 +29,8 @@
 
     @foreach (var item in Model)
     {
+        if (item.BarCodeNumber != 0)
+        {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.BarCodeNumber)
@@ -39,6 +41,7 @@
                 @Html.ActionLink("Delete", "Delete", new { id = item.BarCodeId })
             </td>
         </tr>
+        }
     }
 
 </table>

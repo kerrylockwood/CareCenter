@@ -49,6 +49,35 @@ namespace CareServices
             }
         }
 
+        public IEnumerable<OrderList> GetUnpulledOrders()
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var query =
+                    ctx
+                        .OrderHeaders
+                        .Where(e => e.OrderCompletedAt == null)
+                        .Select(
+                            e =>
+                                new OrderList
+                                {
+                                    OrderId = e.OrderId,
+                                    CustId = e.CustId,
+                                    SlotId = e.SlotId,
+                                    CreateDateTime = e.CreatedAt,
+                                    //SlotDateTime cannot be populated here due to LINQ
+                                    CustFirstName = e.Customer.FirstName,
+                                    CustLastName = e.Customer.LastName,
+                                    Deliver = e.Deliver,
+                                    PullStarted = (e.PullStartedAt == null) ? false : true,
+                                    PullCompleted = (e.OrderCompletedAt == null) ? false : true
+                                }
+                        );
+
+                return query.ToArray();
+            }
+        }
+
         public OrderHeaderDetail GetOrderHeaderByCustId(int id, bool isCust)
         {
             using (var ctx = new ApplicationDbContext())
@@ -109,6 +138,7 @@ namespace CareServices
                     Deliver = entity.Deliver,
                     PullStartedAt = entity.PullStartedAt,
                     PullStartedBy = entity.PullStartedBy,
+                    //PullStartedName = (entity.PullStartedBy == null) ? null : entity.PullStartedUser.UserName,
                     PullStartedName = (entity.PullStartedBy == null) ? null : entity.PullStartedUser.UserName,
                     OrderCompletedAt = entity.OrderCompletedAt,
                     PullCompleted = (entity.OrderCompletedAt == null) ? false : true,
@@ -181,7 +211,9 @@ namespace CareServices
             //OrderHeaderDetail model = GetOrderById(id, isCust);
             OrderUpdate model = GetOrderUpdateById(id, isCust);
 
-            model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, model.CreateDateTime.DateTime, model.Deliver, userId);
+            DateTimeOffset crtDateTime = DateTimeOffset.Now;
+            if (model.CreateDateTime != null) { crtDateTime = model.CreateDateTime.GetValueOrDefault(); }
+            model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, crtDateTime.DateTime, model.Deliver, userId);
             bool shortList = false;
             model.OrderDetailCategoryList = GetOrderDetailByOrderId(id, userId, shortList);
 
@@ -238,7 +270,9 @@ namespace CareServices
                                 MaxAllowed = itm.MaxAllowed,
                                 PointCost = itm.PointCost,
                                 Quantity = newItemDtl.Quantity,
-                                QuantityBefore = newItemDtl.Quantity
+                                QuantityBefore = newItemDtl.Quantity,
+                                Pulled = newItemDtl.Pulled,
+                                PulledBefore = newItemDtl.Pulled
                             };
                             itemDtl.Add(itmDtl);
                             itemAdded = true;
@@ -428,16 +462,6 @@ namespace CareServices
                                 }
                                 else if (itm.QuantityBefore > 0)
                                 {
-                                    // Delete Detail
-                                    //var orderDetail =
-                                    //    new OrderDetailCreate()
-                                    //    {
-                                    //        OrderId = orderRtnStatus.OrderId,
-                                    //        ItemId = itm.ItemId,
-                                    //        Quantity = itm.Quantity,
-                                    //        Filled = false
-                                    //    };
-
                                     if (!orderDetailService.DeleteOrderDetail(itm.OrderDetailId))
                                     {
                                         orderRtnStatus.OrderAllDetailCreated = false;
@@ -451,23 +475,121 @@ namespace CareServices
             return orderRtnStatus;
         }
 
-        //public bool UpdateItem(ItemUpdate model)
-        //{
-        //    using (var ctx = new ApplicationDbContext())
-        //    {
-        //        var entity =
-        //            ctx
-        //                .Items
-        //                .Single(e => e.ItemId == model.ItemId);
-        //        entity.SubCatId = model.SubCatId;
-        //        entity.ItemName = model.ItemName;
-        //        entity.AisleNumber = model.AisleNumber;
-        //        entity.MaxAllowed = model.MaxAllowed;
-        //        entity.PointCost = model.PointCost;
+        public OrderCrtUpdRtnStatus UpdatePulledItems(OrderHeaderDetail model, int orderId, bool isComplete)
+        {
+            OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
+            {
+                OrderHeaderCreated = false,
+                OrderAllDetailCreated = false,
+                OrderId = 0
+            };
+            if (isComplete)
+            {
+                using (var ctx = new ApplicationDbContext())
+                {
+                    var entity =
+                        ctx
+                        .OrderHeaders
+                        .Single(e => e.OrderId == model.OrderId);
+                    entity.OrderCompletedAt = DateTimeOffset.Now;
 
-        //        return ctx.SaveChanges() == 1;
-        //    }
-        //}
+                    try { ctx.SaveChanges(); }
+                    catch { return orderRtnStatus; }
+                }
+                orderRtnStatus.OrderHeaderCreated = true;
+            }
+
+            orderRtnStatus.OrderId = model.OrderId;
+
+            // Assume all OrderDetail records will be created/updated/deleted - make false if any fail.
+            orderRtnStatus.OrderAllDetailCreated = true;
+            OrderDetailService orderDetailService = new OrderDetailService(_userId);
+
+            // Add Order Detail
+            foreach (var catagory in model.OrderDetailCategoryList)
+            {
+                foreach (var subCat in catagory.OrderDetailSubCatList)
+                {
+                    if (subCat.OrderDetailItemList != null)
+                    {
+                        foreach (var itm in subCat.OrderDetailItemList)
+                        {
+                            if (itm.Pulled != itm.PulledBefore)
+                            {
+                                // Marked as Pulled (or un-Pulled)
+                                var orderDetail =
+                                        new OrderDetailUpdate()
+                                        {
+                                            OrderDetailId = itm.OrderDetailId,
+                                            ItemId = itm.ItemId,
+                                            Quantity = itm.Quantity,
+                                            Filled = itm.Pulled
+                                        };
+
+                                if (!orderDetailService.UpdateOrderDetail(orderDetail))
+                                {
+                                    orderRtnStatus.OrderAllDetailCreated = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return orderRtnStatus;
+        }
+
+        public bool CompleteOrder(int id)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                    .OrderHeaders
+                    .Single(e => e.OrderId == id);
+                entity.OrderCompletedAt = DateTimeOffset.Now;
+
+                try { ctx.SaveChanges(); }
+                catch { return false; }
+            }
+
+            return true;
+        }
+
+        public bool StartPullOrder(int orderId)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                    .OrderHeaders
+                    .Single(e => e.OrderId == orderId);
+                entity.PullStartedAt = DateTimeOffset.Now;
+                entity.PullStartedBy = _userId;
+
+                try { ctx.SaveChanges(); }
+                catch { return false; }
+            }
+
+            return true;
+        }
+
+        public bool TakeOverOrder(int orderId, string userId)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                var entity =
+                    ctx
+                    .OrderHeaders
+                    .Single(e => e.OrderId == orderId);
+                //entity.PullStartedName = _userId;
+                entity.PullStartedBy = _userId;
+
+                try { ctx.SaveChanges(); }
+                catch { return false; }
+            }
+
+            return true;
+        }
 
         public bool DeleteOrder(int id)
         {
@@ -480,54 +602,13 @@ namespace CareServices
 
                 ctx.OrderHeaders.Remove(entity);
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
-
-        //// Get Slot Date/Time from Slot DayOfWeek
-        //public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime)
-        //{
-        //    var userId = User.Identity.GetUserId();
-        //    var timeSlotService = new TimeSlotService(userId);
-
-        //    var slotDetail = timeSlotService.GetTimeSlotById(slotId);
-        //    //SlotDetail slotDetail = GetTimeSlotById(slotId);
-        //    TimeSpan Time = new TimeSpan(19, 00, 00);
-        //    int DayOfWeek = 7;
-        //    //*******get slot info here
-
-        //    DateTime weekStartDate = GetWeekStartDate(createDateTime);
-
-        //    return weekStartDate.AddDays(DayOfWeek).Add(Time);
-        //}
-
-        //// Get Slot Date/Time from Slot DayOfWeek
-        //public DateTime GetWeekStartDate(DateTime createDateTime)
-        //{
-        //    // Assumption: Customers can start creating orders on the
-        //    //    day after the last Pickup Slot day and Pickups start
-        //    //    as early as Sunday
-        //    // Get Sunday Date based on date passed in (should be either
-        //    //    Create Date or current date if creating now)
-        //    //*******get *last* slot here
-        //    TimeSpan lastSlotTime = new TimeSpan(19, 00, 00);
-        //    int lastSlotDayOfWeek = 7;
-        //    //*******get *last* slot here
-
-        //    int createDayOfWeek = (int)createDateTime.DayOfWeek;
-        //    DateTime weekStartDate
-        //        = createDateTime.Date.AddDays(createDayOfWeek * -1);
-        //    DateTime orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek).Add(lastSlotTime).AddMinutes(-60);
-
-        //    if (createDateTime > orderCutoffTime)
-        //    {
-        //        // Created after last appointment slot (less buffer)
-        //        // Need to set Start Date to following Sunday
-        //        weekStartDate = weekStartDate.AddDays(7);
-        //    }
-
-        //    return weekStartDate;
-        //}
 
         // Get Slot Date/Time from Slot DayOfWeek
         public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime, bool delivery, string userId)

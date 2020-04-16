@@ -14,6 +14,8 @@ namespace CareModels.Orders
         public int CustId { get; set; }
         public int SlotId { get; set; }
         public bool IsCust { get; set; }
+        public bool IsFromPull { get; set; }
+        public bool IsPull { get; set; }
 
         [Display(Name = "Pickup Date/Time")]
         public DateTime? SlotDateTime { get; set; }
@@ -27,13 +29,16 @@ namespace CareModels.Orders
         [Display(Name = "Delivery")]
         public bool Deliver { get; set; }
 
+        [Display(Name = "Pulled Started At")]
         public DateTimeOffset? PullStartedAt { get; set; }
 
-        public Guid? PullStartedBy { get; set; }
+        [Display(Name = "Pulled Started By")]
+        public string PullStartedBy { get; set; }
 
         [Display(Name = "Pulled By")]
         public string PullStartedName { get; set; }
 
+        [Display(Name = "Order Completed At")]
         public DateTimeOffset? OrderCompletedAt { get; set; }
 
         [Display(Name = "Most Needed Notes")]
@@ -58,6 +63,7 @@ namespace CareModels.Orders
         [Display(Name = "Created By")]
         public string CreateName { get; set; }
 
+        [Display(Name = "Created At")]
         public DateTimeOffset CreateDateTime { get; set; }
 
         public List<OrderDetailCategory> OrderDetailCategoryList { get; set; }
