@@ -20,7 +20,7 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.OrderId)
         @Html.HiddenFor(model => model.CustId)
-        @Html.HiddenFor(model => model.SlotId)
+        @*@Html.HiddenFor(model => model.SlotId)*@
         @Html.HiddenFor(model => model.IsCust)
         @*@Html.HiddenFor(model => model.PullStartedAt)
         @Html.HiddenFor(model => model.PullStartedBy)
@@ -31,7 +31,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.SlotDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.SlotDateTime, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DropDownList("SlotId", null, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.SlotDateTime, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -49,15 +49,15 @@
         <div class="form-group">
             @Html.LabelFor(model => model.MostWantedNotes, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.MostWantedNotes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextAreaFor(model => model.MostWantedNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.MostWantedNotes, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.FreezerNotes, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.FreezerNotes, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="col-md-10" >
+                @Html.TextAreaFor(model => model.FreezerNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.FreezerNotes, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -65,7 +65,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ProduceNotes, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ProduceNotes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextAreaFor(model => model.ProduceNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.ProduceNotes, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -73,7 +73,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.NonFoodNotes, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.NonFoodNotes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextAreaFor(model => model.NonFoodNotes, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.NonFoodNotes, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -89,7 +89,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.CreateDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.CreateDateTime, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DisplayFor(model => model.CreateDateTime, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.CreateDateTime, "", new { @class = "text-danger" })
             </div>
         </div>

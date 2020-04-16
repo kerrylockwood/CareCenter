@@ -4,184 +4,184 @@
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<h2>Order</h2>
 
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
-        <h4>OrderCreate</h4>
-        <hr />
-        @if (TempData.ContainsKey("SaveResult"))
+<div class="form-horizontal">
+    <h4>Order Create</h4>
+    <hr />
+    @if (TempData.ContainsKey("SaveResult"))
+    {
+        <div class="Alert alert-success fade in" role="alert">
+            @ViewBag.SaveResult
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+            @TempData["SaveResult"]
+        </div>
+    }
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.CustId)
+    @Html.HiddenFor(model => model.IsCust)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CustName, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.CustName, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.CustName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.SlotId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("SlotId", null, htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.SlotId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Deliver, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <div class="checkbox">
+                @Html.EditorFor(model => model.Deliver)
+                @Html.ValidationMessageFor(model => model.Deliver, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.MostWantedNotes, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.MostWantedNotes, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.MostWantedNotes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.FreezerNotes, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.FreezerNotes, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.FreezerNotes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProduceNotes, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.ProduceNotes, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.ProduceNotes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.NonFoodNotes, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.NonFoodNotes, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.NonFoodNotes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @for (int i = 0; i < Model.OrderDetailCategoryList.Count; i++)
         {
-            <div class="Alert alert-success fade in" role="alert">
-                @ViewBag.SaveResult
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
-                @TempData["SaveResult"]
-            </div>
-        }
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-        @Html.HiddenFor(model => model.CustId)
-        @Html.HiddenFor(model => model.IsCust)
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.CustName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.CustName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.CustName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.SlotId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("SlotId", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.SlotId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Deliver, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <div class="checkbox">
-                    @Html.EditorFor(model => model.Deliver)
-                    @Html.ValidationMessageFor(model => model.Deliver, "", new { @class = "text-danger" })
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.MostWantedNotes, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.MostWantedNotes, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.MostWantedNotes, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.FreezerNotes, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.FreezerNotes, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.FreezerNotes, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ProduceNotes, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.ProduceNotes, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.ProduceNotes, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.NonFoodNotes, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.NonFoodNotes, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.NonFoodNotes, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @for (int i = 0; i < Model.OrderDetailCategoryList.Count; i++)
+            <h3 style="color:dodgerblue">
+                @Html.DisplayFor(catModel => catModel.OrderDetailCategoryList[i].CategoryName)
+            </h3>
+            <p hidden>
+                @Html.EditorFor(catModel => catModel.OrderDetailCategoryList[i].CategoryId)
+                @Html.EditorFor(catModel => catModel.OrderDetailCategoryList[i].CategoryName)
+                @Html.EditorFor(catModel => catModel.OrderDetailCategoryList[i].OrderDetailSubCatList)
+            </p>
+            for (int j = 0; j < Model.OrderDetailCategoryList[i].OrderDetailSubCatList.Count; j++)
             {
-                <h3 style="color:dodgerblue">
-                    @Html.DisplayFor(catModel => catModel.OrderDetailCategoryList[i].CategoryName)
-                </h3>
-                <p hidden>
-                    @Html.EditorFor(catModel => catModel.OrderDetailCategoryList[i].CategoryId)
-                    @Html.EditorFor(catModel => catModel.OrderDetailCategoryList[i].CategoryName)
-                    @Html.EditorFor(catModel => catModel.OrderDetailCategoryList[i].OrderDetailSubCatList)
-                </p>
-                for (int j = 0; j < Model.OrderDetailCategoryList[i].OrderDetailSubCatList.Count; j++)
+                if (Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed == 0)
                 {
-                    if (Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed == 0)
-                    {
-                        <h4 style="color:deepskyblue;">
-                            @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)
-                        </h4>
-                    }
-                    if (Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed != 0)
-                    {
-                        <h4 style="color:deepskyblue;">
-                            @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)    &emsp; Maximum Quantity for this section: @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed)
-                        </h4>
-                    }
-                    <p hidden>
-                        @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatId)
-                        @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].CategoryId)
-                        @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)
-                        @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed)
-                    </p>
-                    <div style="text-indent:1.5em;">
-                        <table class="table">
-                            <tr>
-                                <th>
-                                    @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].ItemName)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].PointCost)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].Quantity)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].MaxAllowed)
-                                </th>
-                            </tr>
-
-                            @for (int k = 0; k < Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList.Count; k++)
-                            {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].PointCost)
-                                    </td>
-                                    <td>
-                                        @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].Quantity)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
-                                    </td>
-                                    <td hidden>
-                                        @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemId)
-                                        @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemName)
-                                        @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].PointCost)
-                                        @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
-                                    </td>
-                                </tr>
-                            }
-                        </table>
-                    </div>
+                    <h4 style="color:deepskyblue;">
+                        @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)
+                    </h4>
                 }
+                if (Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed != 0)
+                {
+                    <h4 style="color:deepskyblue;">
+                        @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)    &emsp; Maximum Quantity for this section: @Html.DisplayFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed)
+                    </h4>
+                }
+                <p hidden>
+                    @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatId)
+                    @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].CategoryId)
+                    @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatName)
+                    @Html.EditorFor(subCatModel => subCatModel.OrderDetailCategoryList[i].OrderDetailSubCatList[j].SubCatMaxAllowed)
+                </p>
+                <div style="text-indent:1.5em;">
+                    <table class="table">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].ItemName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].PointCost)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].Quantity)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(itmItem => Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[0].MaxAllowed)
+                            </th>
+                        </tr>
+
+                        @for (int k = 0; k < Model.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList.Count; k++)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].PointCost)
+                                </td>
+                                <td>
+                                    @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].Quantity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
+                                </td>
+                                <td hidden>
+                                    @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemId)
+                                    @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].ItemName)
+                                    @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].PointCost)
+                                    @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
             }
-
-        </div>
-
-        @if (TempData.ContainsKey("SaveResult"))
-        {
-            <div class="Alert alert-success fade in" role="alert">
-                @ViewBag.SaveResult
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
-                @TempData["SaveResult"]
-            </div>
         }
+
+    </div>
+
+    @if (TempData.ContainsKey("SaveResult"))
+    {
+        <div class="Alert alert-success fade in" role="alert">
+            @ViewBag.SaveResult
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+            @TempData["SaveResult"]
+        </div>
+    }
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
         </div>
-    </div>
+</div>
 }
 
 @if (Model.IsCust)

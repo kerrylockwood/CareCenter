@@ -211,7 +211,9 @@ namespace CareServices
             //OrderHeaderDetail model = GetOrderById(id, isCust);
             OrderUpdate model = GetOrderUpdateById(id, isCust);
 
-            model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, model.CreateDateTime.DateTime, model.Deliver, userId);
+            DateTimeOffset crtDateTime = DateTimeOffset.Now;
+            if (model.CreateDateTime != null) { crtDateTime = model.CreateDateTime.GetValueOrDefault(); }
+            model.SlotDateTime = ConvertSlotToDateTime(model.SlotId, crtDateTime.DateTime, model.Deliver, userId);
             bool shortList = false;
             model.OrderDetailCategoryList = GetOrderDetailByOrderId(id, userId, shortList);
 

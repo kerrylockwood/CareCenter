@@ -110,12 +110,17 @@ namespace GraceCareCenterOrder.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.TimeSlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
+                ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
                 return View(model);
             }
 
             string errorFound = EditItems(model.OrderDetailCategoryList);
-            if (errorFound != null) return View(model);
+            if (errorFound != null)
+            {
+                ModelState.AddModelError("", errorFound);
+                ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
+                return View(model);
+            }
 
             var service = CreateOrderService();
 
@@ -141,7 +146,7 @@ namespace GraceCareCenterOrder.Controllers
 
             ModelState.AddModelError("", "Order could not be created.");
 
-            ViewBag.TimeSlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
+            ViewBag.SlotId = BuildTimeSlotDropdown(model.Deliver, model.SlotId);
 
             return View(model);
         }
