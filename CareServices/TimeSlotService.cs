@@ -144,7 +144,12 @@ namespace CareServices
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.TimeSlots.Add(entity);
-                return ctx.SaveChanges() == 1;
+
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -160,7 +165,11 @@ namespace CareServices
                 entity.Time = model.Time;
                 entity.MaxPerSlot = model.MaxPerSlot;
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -175,7 +184,11 @@ namespace CareServices
 
                 ctx.TimeSlots.Remove(entity);
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
     }

@@ -29,7 +29,12 @@ namespace CareServices
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.BarCodes.Add(entity);
-                return ctx.SaveChanges() == 1;
+
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -133,7 +138,11 @@ namespace CareServices
 
                 ctx.BarCodes.Remove(entity);
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
     }

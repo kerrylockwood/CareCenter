@@ -112,7 +112,12 @@ namespace CareServices
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.Items.Add(entity);
-                return ctx.SaveChanges() == 1;
+
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -130,7 +135,11 @@ namespace CareServices
                 entity.MaxAllowed = model.MaxAllowed;
                 entity.PointCost = model.PointCost;
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -145,7 +154,11 @@ namespace CareServices
 
                 ctx.Items.Remove(entity);
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
     }

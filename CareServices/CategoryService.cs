@@ -69,7 +69,12 @@ namespace CareServices
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.Categories.Add(entity);
-                return ctx.SaveChanges() == 1;
+
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -83,7 +88,11 @@ namespace CareServices
                         .Single(e => e.CategoryId == model.CategoryId);
                 entity.CategoryName = model.CategoryName;
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
 
@@ -98,7 +107,11 @@ namespace CareServices
 
                 ctx.Categories.Remove(entity);
 
-                return ctx.SaveChanges() == 1;
+                bool success = true;
+                try { ctx.SaveChanges(); }
+                catch { success = false; }
+
+                return success;
             }
         }
     }
