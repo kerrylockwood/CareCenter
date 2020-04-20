@@ -108,6 +108,32 @@ namespace CareServices
             }
         }
 
+        public SlotDetail GetTimeSlotByDayTime(int day, TimeSpan time)
+        {
+            using (var ctx = new ApplicationDbContext())
+            {
+                if (ctx.TimeSlots.Count(e => e.DayOfWeekNum == day && e.Time == time) == 0)
+                {
+                    return new SlotDetail { SlotId = 0 };
+                }
+                var entity =
+                    ctx
+                        .TimeSlots
+                        .Single(e => e.DayOfWeekNum == day && e.Time == time);
+                return
+                    new SlotDetail
+                    {
+                        SlotId = entity.SlotId,
+                        DayOfWeekNum = entity.DayOfWeekNum,
+                        DayOfWeekStr = ((DayOfWeek)entity.DayOfWeekNum).ToString(),
+                        Time = entity.Time,
+                        MaxPerSlot = entity.MaxPerSlot,
+                        CreateAt = entity.CreateAt,
+                        CreateName = entity.User.UserName
+                    };
+            }
+        }
+
         public SlotDetail GetMaxTimeSlot()
         {
             using (var ctx = new ApplicationDbContext())

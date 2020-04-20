@@ -4,7 +4,7 @@
     ViewBag.Title = "PullOrder";
 }
 
-<h2>PullOrder</h2>
+<h2>Pull Order</h2>
 
 
 @using (Html.BeginForm())
@@ -12,7 +12,7 @@
     @Html.AntiForgeryToken()
     
 <div class="form-horizontal">
-    <h4>OrderHeaderDetail</h4>
+    <h4>Pulling Order</h4>
     <hr />
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
     @Html.HiddenFor(model => model.OrderId)
@@ -182,6 +182,7 @@
                                     @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].PointCost)
                                     @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
                                     @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].QuantityBefore)
+                                    @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].Quantity)
                                     @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].MaxAllowed)
                                     @Html.EditorFor(itmItem => itmItem.OrderDetailCategoryList[i].OrderDetailSubCatList[j].OrderDetailItemList[k].PulledBefore)
                                 </td>
@@ -203,13 +204,6 @@
     </div>
 </div>
 }
-
-<div>
-    @*@Html.ActionLink("Complete Order", "PullOrderComplete", "Order", new { id = Model.OrderId, model = Model, isComplete = true }, new { @class = "btn btn-primary btn-large" })
-    @Html.ActionLink("Update Pull-Leave Order Open", "PullOrderComplete", "Order", new { id = Model.OrderId, model = Model, isComplete = false }, new { @class = "btn btn-primary btn-large" })
-    @Html.ActionLink("Cancel", "PullIndex", "Order", null, new { @class = "btn btn-primary btn-large" })*@
-    @*@Html.ActionLink("Back to List", "Index")*@
-</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

@@ -24,6 +24,7 @@ namespace CareServices
                 var query =
                     ctx
                         .Items
+                        //.OrderBy(e => e.SubCategory.Category.CategoryName).ThenBy(e => e.SubCategory.SubCatName).ThenBy(e => e.ItemName)
                         .Select(
                             e =>
                                 new ItemList

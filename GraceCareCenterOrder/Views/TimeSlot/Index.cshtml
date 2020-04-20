@@ -4,11 +4,21 @@
     ViewBag.Title = "Index";
 }
 
-    <h2>Pantry Pickup Time Slots</h2>
+<h2>Pantry Pickup Time Slots</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+@if (TempData.ContainsKey("SaveResult"))
+{
+    <div class="Alert alert-success fade in" role="alert">
+        @ViewBag.SaveResult
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+        @TempData["SaveResult"]
+    </div>
+}
 <table class="table">
     <tr>
         <th>
@@ -23,23 +33,24 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-<tr>
-    <td>
-        @Html.DisplayFor(modelItem => item.DayOfWeekStr)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Time)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.MaxPerSlot)
-    </td>
-    <td>
-        @Html.ActionLink("Edit", "Edit", new { id = item.SlotId }) |
-        @Html.ActionLink("Details", "Details", new { id = item.SlotId }) |
-        @Html.ActionLink("Delete", "Delete", new { id = item.SlotId })
-    </td>
-</tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DayOfWeekStr)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Time)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaxPerSlot)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.SlotId }) |
+                @Html.ActionLink("Details", "Details", new { id = item.SlotId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.SlotId })
+            </td>
+        </tr>
+    }
 
 </table>

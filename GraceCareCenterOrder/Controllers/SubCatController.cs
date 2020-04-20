@@ -25,13 +25,7 @@ namespace GraceCareCenterOrder.Controllers
         // Get: SubCategory/Create
         public ActionResult Create()
         {
-            var userId = User.Identity.GetUserId();
-            var catService = new CategoryService(userId);
-
-            var newCategoryList = new SelectList(catService.GetCategories(), "CategoryId", "CategoryName");
-            var sortedCatagoryList = newCategoryList.OrderBy(o => o.Text);
-
-            ViewBag.CategoryId = sortedCatagoryList;
+            ViewBag.CategoryId = BuildCategoryDropdown(0);
             return View();
         }
 
@@ -40,7 +34,11 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(SubCatCreate model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.CategoryId = BuildCategoryDropdown(model.CategoryId);
+                return View(model);
+            }
 
             var service = CreateSubCatService();
 
@@ -52,6 +50,7 @@ namespace GraceCareCenterOrder.Controllers
 
             ModelState.AddModelError("", $"'{model.SubCatName}' could not be created.");
 
+            ViewBag.CategoryId = BuildCategoryDropdown(model.CategoryId);
             return View(model);
         }
 
@@ -78,13 +77,7 @@ namespace GraceCareCenterOrder.Controllers
                     SubCatMaxAllowed = detail.SubCatMaxAllowed
                 };
 
-            var userId = User.Identity.GetUserId();
-            var catService = new CategoryService(userId);
-
-            var newCategoryList = new SelectList(catService.GetCategories(), "CategoryId", "CategoryName", model.CategoryId);
-            var sortedCatagoryList = newCategoryList.OrderBy(o => o.Text);
-
-            ViewBag.CategoryId = sortedCatagoryList;
+            ViewBag.CategoryId = BuildCategoryDropdown(model.CategoryId);
             return View(model);
         }
 
@@ -93,11 +86,16 @@ namespace GraceCareCenterOrder.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, SubCatUpdate model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.CategoryId = BuildCategoryDropdown(model.CategoryId);
+                return View(model);
+            }
 
             if (model.SubCatId != id)
             {
                 ModelState.AddModelError("", "Id Mismatch");
+                ViewBag.CategoryId = BuildCategoryDropdown(model.CategoryId);
                 return View(model);
             }
 
@@ -110,6 +108,7 @@ namespace GraceCareCenterOrder.Controllers
             }
 
             ModelState.AddModelError("", $"'{model.SubCatName}' could not be updated.");
+            ViewBag.CategoryId = BuildCategoryDropdown(model.CategoryId);
             return View(model);
         }
 
@@ -143,6 +142,18 @@ namespace GraceCareCenterOrder.Controllers
             var userId = User.Identity.GetUserId();
             var service = new SubCatService(userId);
             return service;
+        }
+
+        // Build Category Dropdown
+        private IOrderedEnumerable<SelectListItem> BuildCategoryDropdown(int categoryId)
+        {
+            var userId = User.Identity.GetUserId();
+            var catService = new CategoryService(userId);
+
+            var newCategoryList = new SelectList(catService.GetCategories(), "CategoryId", "CategoryName", categoryId);
+            var sortedCategoryList = newCategoryList.OrderBy(o => o.Text);
+
+            return sortedCategoryList;
         }
     }
 }

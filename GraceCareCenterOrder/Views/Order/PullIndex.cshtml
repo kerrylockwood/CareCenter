@@ -58,7 +58,6 @@
             <td>
                 @Html.ActionLink("Details", "Details", "Order", new { id = item.OrderId, isFromPull = true, isPull = false }, new { @class = "btn btn-primary btn-large" })
                 @Html.ActionLink("Start Pull", "StartPull", "Order", new { orderId = item.OrderId }, new { @class = "btn btn-success btn-large" })
-                @*@Html.ActionLink("Complete Order", "Complete", "Order", new { id = item.OrderId }, new { @class = "btn btn-primary btn-large" })*@
                 <a class="btn btn-primary" data-toggle="modal" data-target=".bootstrapmodal"> Complete Order </a>
 
                 <div class="modal fade bootstrapmodal">

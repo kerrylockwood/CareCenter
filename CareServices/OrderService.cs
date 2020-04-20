@@ -305,43 +305,203 @@ namespace CareServices
             }
 
             return catDtlList;
-        }
+            }
 
-        public OrderCrtUpdRtnStatus CreateOrder(OrderCreate model)
-        {
-            OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
+            public OrderCrtUpdRtnStatus CreateOrder(OrderCreate model)
             {
-                OrderHeaderCreated = false,
-                OrderAllDetailCreated = false,
-                OrderId = 0
-            };
-            var entity =
-                new OrderHeader()
+                OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
                 {
-                    CustId = model.CustId,
-                    SlotId = model.SlotId,
-                    MostWantedNotes = model.MostWantedNotes,
-                    FreezerNotes = model.FreezerNotes,
-                    ProduceNotes = model.ProduceNotes,
-                    NonFoodNotes = model.NonFoodNotes,
-                    Deliver = model.Deliver,
-                    PullStartedAt = null,
-                    PullStartedBy = null,
-                    OrderCompletedAt = null,
-                    CreateBy = _userId,
-                    CreatedAt = DateTimeOffset.Now
+                    OrderHeaderCreated = false,
+                    OrderAllDetailCreated = false,
+                    OrderId = 0
                 };
-            using (var ctx = new ApplicationDbContext())
+                var entity =
+                    new OrderHeader()
+                    {
+                        CustId = model.CustId,
+                        SlotId = model.SlotId,
+                        MostWantedNotes = model.MostWantedNotes,
+                        FreezerNotes = model.FreezerNotes,
+                        ProduceNotes = model.ProduceNotes,
+                        NonFoodNotes = model.NonFoodNotes,
+                        Deliver = model.Deliver,
+                        PullStartedAt = null,
+                        PullStartedBy = null,
+                        OrderCompletedAt = null,
+                        CreateBy = _userId,
+                        CreatedAt = DateTimeOffset.Now
+                    };
+                using (var ctx = new ApplicationDbContext())
+                {
+                    ctx.OrderHeaders.Add(entity);
+
+                    try { ctx.SaveChanges(); }
+                    catch { return orderRtnStatus; }
+
+                    orderRtnStatus.OrderHeaderCreated = true;
+                    orderRtnStatus.OrderId = entity.OrderId;
+
+                    // Assume all OrderDetail records will be written - make false if any fail.
+                    orderRtnStatus.OrderAllDetailCreated = true;
+                    OrderDetailService orderDetailService = new OrderDetailService(_userId);
+
+                    // Add Order Detail
+                    foreach (var catagory in model.OrderDetailCategoryList)
+                    {
+                        foreach (var subCat in catagory.OrderDetailSubCatList)
+                        {
+                            if (subCat.OrderDetailItemList != null)
+                            {
+                                foreach (var itm in subCat.OrderDetailItemList)
+                                {
+                                    if (itm.Quantity > 0)
+                                    {
+                                        var orderDetail =
+                                            new OrderDetailCreate()
+                                            {
+                                                OrderId = orderRtnStatus.OrderId,
+                                                ItemId = itm.ItemId,
+                                                Quantity = itm.Quantity,
+                                                QuantityBefore = itm.Quantity,
+                                                Filled = false
+                                            };
+
+                                        if (!orderDetailService.CreateOrderDetail(orderDetail))
+                                        {
+                                            orderRtnStatus.OrderAllDetailCreated = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return orderRtnStatus;
+            }
+
+            public OrderCrtUpdRtnStatus UpdateOrder(OrderUpdate model)
             {
-                ctx.OrderHeaders.Add(entity);
+                OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
+                {
+                    OrderHeaderCreated = false,
+                    OrderAllDetailCreated = false,
+                    OrderId = 0
+                };
+                using (var ctx = new ApplicationDbContext())
+                {
+                    var entity =
+                        ctx
+                        .OrderHeaders
+                        .Single(e => e.OrderId == model.OrderId);
+                    entity.CustId = model.CustId;
+                    entity.SlotId = model.SlotId;
+                    entity.MostWantedNotes = model.MostWantedNotes;
+                    entity.FreezerNotes = model.FreezerNotes;
+                    entity.ProduceNotes = model.ProduceNotes;
+                    entity.NonFoodNotes = model.NonFoodNotes;
+                    entity.Deliver = model.Deliver;
+                    entity.PullStartedAt = null;
+                    entity.PullStartedBy = null;
+                    entity.OrderCompletedAt = null;
 
-                try { ctx.SaveChanges(); }
-                catch { return orderRtnStatus; }
-
+                    try { ctx.SaveChanges(); }
+                    catch { return orderRtnStatus; }
+                }
                 orderRtnStatus.OrderHeaderCreated = true;
-                orderRtnStatus.OrderId = entity.OrderId;
 
-                // Assume all OrderDetail records will be written - make false if any fail.
+                orderRtnStatus.OrderId = model.OrderId;
+
+                // Assume all OrderDetail records will be created/updated/deleted - make false if any fail.
+                orderRtnStatus.OrderAllDetailCreated = true;
+                OrderDetailService orderDetailService = new OrderDetailService(_userId);
+
+                // Add/Update/Delete Order Detail
+                foreach (var catagory in model.OrderDetailCategoryList)
+                {
+                    foreach (var subCat in catagory.OrderDetailSubCatList)
+                    {
+                        if (subCat.OrderDetailItemList != null)
+                        {
+                            foreach (var itm in subCat.OrderDetailItemList)
+                            {
+                                if (itm.Quantity != itm.QuantityBefore)
+                                {
+                                    if (itm.Quantity > 0 && itm.QuantityBefore > 0)
+                                    {
+                                        // Quantity changed
+                                        var orderDetail =
+                                            new OrderDetailUpdate()
+                                            {
+                                                OrderDetailId = itm.OrderDetailId,
+                                                ItemId = itm.ItemId,
+                                                Quantity = itm.Quantity,
+                                                Filled = false
+                                            };
+
+                                        if (!orderDetailService.UpdateOrderDetail(orderDetail))
+                                        {
+                                            orderRtnStatus.OrderAllDetailCreated = false;
+                                        }
+                                    }
+                                    else if (itm.Quantity > 0)
+                                    {
+                                        // Add Detail
+                                        var orderDetail =
+                                            new OrderDetailCreate()
+                                            {
+                                                OrderId = orderRtnStatus.OrderId,
+                                                ItemId = itm.ItemId,
+                                                Quantity = itm.Quantity,
+                                                Filled = false
+                                            };
+
+                                        if (!orderDetailService.CreateOrderDetail(orderDetail))
+                                        {
+                                            orderRtnStatus.OrderAllDetailCreated = false;
+                                        }
+                                    }
+                                    else if (itm.QuantityBefore > 0)
+                                    {
+                                        if (!orderDetailService.DeleteOrderDetail(itm.OrderDetailId))
+                                        {
+                                            orderRtnStatus.OrderAllDetailCreated = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return orderRtnStatus;
+            }
+
+            public OrderCrtUpdRtnStatus UpdatePulledItems(OrderHeaderDetail model, int orderId, bool isComplete)
+            {
+                OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
+                {
+                    OrderHeaderCreated = false,
+                    OrderAllDetailCreated = false,
+                    OrderId = 0
+                };
+                if (isComplete)
+                {
+                    using (var ctx = new ApplicationDbContext())
+                    {
+                        var entity =
+                            ctx
+                            .OrderHeaders
+                            .Single(e => e.OrderId == model.OrderId);
+                        entity.OrderCompletedAt = DateTimeOffset.Now;
+
+                        try { ctx.SaveChanges(); }
+                        catch { return orderRtnStatus; }
+                    }
+                    orderRtnStatus.OrderHeaderCreated = true;
+                }
+
+                orderRtnStatus.OrderId = model.OrderId;
+
+                // Assume all OrderDetail records will be created/updated/deleted - make false if any fail.
                 orderRtnStatus.OrderAllDetailCreated = true;
                 OrderDetailService orderDetailService = new OrderDetailService(_userId);
 
@@ -354,324 +514,164 @@ namespace CareServices
                         {
                             foreach (var itm in subCat.OrderDetailItemList)
                             {
-                                if (itm.Quantity > 0)
+                                if (itm.Pulled != itm.PulledBefore)
                                 {
+                                    // Marked as Pulled (or un-Pulled)
                                     var orderDetail =
-                                        new OrderDetailCreate()
-                                        {
-                                            OrderId = orderRtnStatus.OrderId,
-                                            ItemId = itm.ItemId,
-                                            Quantity = itm.Quantity,
-                                            QuantityBefore = itm.Quantity,
-                                            Filled = false
-                                        };
-
-                                    if (!orderDetailService.CreateOrderDetail(orderDetail))
-                                    {
-                                        orderRtnStatus.OrderAllDetailCreated = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return orderRtnStatus;
-        }
-
-        public OrderCrtUpdRtnStatus UpdateOrder(OrderUpdate model)
-        {
-            OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
-            {
-                OrderHeaderCreated = false,
-                OrderAllDetailCreated = false,
-                OrderId = 0
-            };
-            using (var ctx = new ApplicationDbContext())
-            {
-                var entity =
-                    ctx
-                    .OrderHeaders
-                    .Single(e => e.OrderId == model.OrderId);
-                entity.CustId = model.CustId;
-                entity.SlotId = model.SlotId;
-                entity.MostWantedNotes = model.MostWantedNotes;
-                entity.FreezerNotes = model.FreezerNotes;
-                entity.ProduceNotes = model.ProduceNotes;
-                entity.NonFoodNotes = model.NonFoodNotes;
-                entity.Deliver = model.Deliver;
-                entity.PullStartedAt = null;
-                entity.PullStartedBy = null;
-                entity.OrderCompletedAt = null;
-
-                try { ctx.SaveChanges(); }
-                catch { return orderRtnStatus; }
-            }
-            orderRtnStatus.OrderHeaderCreated = true;
-
-            orderRtnStatus.OrderId = model.OrderId;
-
-            // Assume all OrderDetail records will be created/updated/deleted - make false if any fail.
-            orderRtnStatus.OrderAllDetailCreated = true;
-            OrderDetailService orderDetailService = new OrderDetailService(_userId);
-
-            // Add Order Detail
-            foreach (var catagory in model.OrderDetailCategoryList)
-            {
-                foreach (var subCat in catagory.OrderDetailSubCatList)
-                {
-                    if (subCat.OrderDetailItemList != null)
-                    {
-                        foreach (var itm in subCat.OrderDetailItemList)
-                        {
-                            if (itm.Quantity != itm.QuantityBefore)
-                            {
-                                if (itm.Quantity > 0 && itm.QuantityBefore > 0)
-                                {
-                                    // Quantity changed
-                                    var orderDetail =
-                                        new OrderDetailUpdate()
-                                        {
-                                            OrderDetailId = itm.OrderDetailId,
-                                            ItemId = itm.ItemId,
-                                            Quantity = itm.Quantity,
-                                            Filled = false
-                                        };
+                                            new OrderDetailUpdate()
+                                            {
+                                                OrderDetailId = itm.OrderDetailId,
+                                                ItemId = itm.ItemId,
+                                                Quantity = itm.Quantity,
+                                                Filled = itm.Pulled
+                                            };
 
                                     if (!orderDetailService.UpdateOrderDetail(orderDetail))
                                     {
                                         orderRtnStatus.OrderAllDetailCreated = false;
                                     }
                                 }
-                                else if (itm.Quantity > 0)
-                                {
-                                    // Add Detail
-                                    var orderDetail =
-                                        new OrderDetailCreate()
-                                        {
-                                            OrderId = orderRtnStatus.OrderId,
-                                            ItemId = itm.ItemId,
-                                            Quantity = itm.Quantity,
-                                            Filled = false
-                                        };
-
-                                    if (!orderDetailService.CreateOrderDetail(orderDetail))
-                                    {
-                                        orderRtnStatus.OrderAllDetailCreated = false;
-                                    }
-                                }
-                                else if (itm.QuantityBefore > 0)
-                                {
-                                    if (!orderDetailService.DeleteOrderDetail(itm.OrderDetailId))
-                                    {
-                                        orderRtnStatus.OrderAllDetailCreated = false;
-                                    }
-                                }
                             }
                         }
                     }
                 }
+                return orderRtnStatus;
             }
-            return orderRtnStatus;
-        }
 
-        public OrderCrtUpdRtnStatus UpdatePulledItems(OrderHeaderDetail model, int orderId, bool isComplete)
-        {
-            OrderCrtUpdRtnStatus orderRtnStatus = new OrderCrtUpdRtnStatus
-            {
-                OrderHeaderCreated = false,
-                OrderAllDetailCreated = false,
-                OrderId = 0
-            };
-            if (isComplete)
+            public bool CompleteOrder(int id)
             {
                 using (var ctx = new ApplicationDbContext())
                 {
                     var entity =
                         ctx
                         .OrderHeaders
-                        .Single(e => e.OrderId == model.OrderId);
+                        .Single(e => e.OrderId == id);
                     entity.OrderCompletedAt = DateTimeOffset.Now;
 
                     try { ctx.SaveChanges(); }
-                    catch { return orderRtnStatus; }
+                    catch { return false; }
                 }
-                orderRtnStatus.OrderHeaderCreated = true;
+
+                return true;
             }
 
-            orderRtnStatus.OrderId = model.OrderId;
-
-            // Assume all OrderDetail records will be created/updated/deleted - make false if any fail.
-            orderRtnStatus.OrderAllDetailCreated = true;
-            OrderDetailService orderDetailService = new OrderDetailService(_userId);
-
-            // Add Order Detail
-            foreach (var catagory in model.OrderDetailCategoryList)
+            public bool StartPullOrder(int orderId)
             {
-                foreach (var subCat in catagory.OrderDetailSubCatList)
+                using (var ctx = new ApplicationDbContext())
                 {
-                    if (subCat.OrderDetailItemList != null)
-                    {
-                        foreach (var itm in subCat.OrderDetailItemList)
-                        {
-                            if (itm.Pulled != itm.PulledBefore)
-                            {
-                                // Marked as Pulled (or un-Pulled)
-                                var orderDetail =
-                                        new OrderDetailUpdate()
-                                        {
-                                            OrderDetailId = itm.OrderDetailId,
-                                            ItemId = itm.ItemId,
-                                            Quantity = itm.Quantity,
-                                            Filled = itm.Pulled
-                                        };
+                    var entity =
+                        ctx
+                        .OrderHeaders
+                        .Single(e => e.OrderId == orderId);
+                    entity.PullStartedAt = DateTimeOffset.Now;
+                    entity.PullStartedBy = _userId;
 
-                                if (!orderDetailService.UpdateOrderDetail(orderDetail))
-                                {
-                                    orderRtnStatus.OrderAllDetailCreated = false;
-                                }
-                            }
-                        }
-                    }
+                    try { ctx.SaveChanges(); }
+                    catch { return false; }
+                }
+
+                return true;
+            }
+
+            public bool TakeOverOrder(int orderId, string userId)
+            {
+                using (var ctx = new ApplicationDbContext())
+                {
+                    var entity =
+                        ctx
+                        .OrderHeaders
+                        .Single(e => e.OrderId == orderId);
+                    //entity.PullStartedName = _userId;
+                    entity.PullStartedBy = _userId;
+
+                    try { ctx.SaveChanges(); }
+                    catch { return false; }
+                }
+
+                return true;
+            }
+
+            public bool DeleteOrder(int id)
+            {
+                using (var ctx = new ApplicationDbContext())
+                {
+                    var entity =
+                        ctx
+                            .OrderHeaders
+                            .Single(e => e.OrderId == id);
+
+                    ctx.OrderHeaders.Remove(entity);
+
+                    bool success = true;
+                    try { ctx.SaveChanges(); }
+                    catch { success = false; }
+
+                    return success;
                 }
             }
-            return orderRtnStatus;
-        }
 
-        public bool CompleteOrder(int id)
-        {
-            using (var ctx = new ApplicationDbContext())
+            // Get Slot Date/Time from Slot DayOfWeek
+            public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime, bool delivery, string userId)
             {
-                var entity =
-                    ctx
-                    .OrderHeaders
-                    .Single(e => e.OrderId == id);
-                entity.OrderCompletedAt = DateTimeOffset.Now;
+                var timeSlotService = new TimeSlotService(userId);
 
-                try { ctx.SaveChanges(); }
-                catch { return false; }
+                var slotDetail = timeSlotService.GetTimeSlotById(slotId);
+
+                DateTime weekStartDate = GetWeekStartDate(createDateTime, delivery, userId);
+
+                return weekStartDate.AddDays(slotDetail.DayOfWeekNum).Add(slotDetail.Time);
             }
 
-            return true;
-        }
-
-        public bool StartPullOrder(int orderId)
-        {
-            using (var ctx = new ApplicationDbContext())
+            // Get Slot Date/Time from Slot DayOfWeek
+            public DateTime GetWeekStartDate(DateTime createDateTime, bool delivery, string userId)
             {
-                var entity =
-                    ctx
-                    .OrderHeaders
-                    .Single(e => e.OrderId == orderId);
-                entity.PullStartedAt = DateTimeOffset.Now;
-                entity.PullStartedBy = _userId;
+                // Gets Sunday's Date of the Week where Customers can next pick
+                //    up orders.  If the createDateTime is before the last time
+                //    slot available for pickup, this date will be the Sunday
+                //    before.  Otherwise it will be the Sunday after.
+                // createDateTime passed in will be the DateTime the order was
+                //    created for existing orders or the current DateTime for
+                //    new orders.
+                // Assumption: Customers can start creating orders on the
+                //    day after the last Pickup Slot day and Pickups start
+                //    as early as Sunday
 
-                try { ctx.SaveChanges(); }
-                catch { return false; }
+                // Get Last Slot Day and Time. This will be used to determine
+                //    if Sunday will be before or after the createDateTime passed in
+
+                var timeSlotService = new TimeSlotService(userId);
+
+                var slotDetail = timeSlotService.GetMaxTimeSlot();
+                int lastSlotDayOfWeek = slotDetail.DayOfWeekNum;
+                TimeSpan lastSlotTime = slotDetail.Time;
+
+                // To get weekStartDate: 1) strip off time, 2) subtract the
+                //    number of days we are into the next week.
+                // Assumption (again): First day of week for pickup is Sunday
+                int createDayOfWeek = (int)createDateTime.DayOfWeek;
+                DateTime weekStartDate
+                    = createDateTime.Date.AddDays(createDayOfWeek * -1);
+                DateTime orderCutoffTime = new DateTime();
+
+                // For Delivery, cutoff time is midnight yesterday.  Otherwise
+                //    it is 2 hours (randomly selected) ago.
+                if (delivery)
+                {
+                    orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek);
+                }
+                else
+                {
+                    orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek).Add(lastSlotTime).AddMinutes(-120);
+                }
+
+                if (createDateTime >= orderCutoffTime)
+                {
+                    // Created after last appointment slot (less buffer)
+                    // Need to set Start Date to following Sunday
+                    weekStartDate = weekStartDate.AddDays(7);
+                }
+
+                return weekStartDate;
             }
-
-            return true;
-        }
-
-        public bool TakeOverOrder(int orderId, string userId)
-        {
-            using (var ctx = new ApplicationDbContext())
-            {
-                var entity =
-                    ctx
-                    .OrderHeaders
-                    .Single(e => e.OrderId == orderId);
-                //entity.PullStartedName = _userId;
-                entity.PullStartedBy = _userId;
-
-                try { ctx.SaveChanges(); }
-                catch { return false; }
-            }
-
-            return true;
-        }
-
-        public bool DeleteOrder(int id)
-        {
-            using (var ctx = new ApplicationDbContext())
-            {
-                var entity =
-                    ctx
-                        .OrderHeaders
-                        .Single(e => e.OrderId == id);
-
-                ctx.OrderHeaders.Remove(entity);
-
-                bool success = true;
-                try { ctx.SaveChanges(); }
-                catch { success = false; }
-
-                return success;
-            }
-        }
-
-        // Get Slot Date/Time from Slot DayOfWeek
-        public DateTime ConvertSlotToDateTime(int slotId, DateTime createDateTime, bool delivery, string userId)
-        {
-            var timeSlotService = new TimeSlotService(userId);
-
-            var slotDetail = timeSlotService.GetTimeSlotById(slotId);
-
-            DateTime weekStartDate = GetWeekStartDate(createDateTime, delivery, userId);
-
-            return weekStartDate.AddDays(slotDetail.DayOfWeekNum).Add(slotDetail.Time);
-        }
-
-        // Get Slot Date/Time from Slot DayOfWeek
-        public DateTime GetWeekStartDate(DateTime createDateTime, bool delivery, string userId)
-        {
-            // Gets Sunday's Date of the Week where Customers can next pick
-            //    up orders.  If the createDateTime is before the last time
-            //    slot available for pickup, this date will be the Sunday
-            //    before.  Otherwise it will be the Sunday after.
-            // createDateTime passed in will be the DateTime the order was
-            //    created for existing orders or the current DateTime for
-            //    new orders.
-            // Assumption: Customers can start creating orders on the
-            //    day after the last Pickup Slot day and Pickups start
-            //    as early as Sunday
-
-            // Get Last Slot Day and Time. This will be used to determine
-            //    if Sunday will be before or after the createDateTime passed in
-
-            var timeSlotService = new TimeSlotService(userId);
-
-            var slotDetail = timeSlotService.GetMaxTimeSlot();
-            int lastSlotDayOfWeek = slotDetail.DayOfWeekNum;
-            TimeSpan lastSlotTime = slotDetail.Time;
-
-            // To get weekStartDate: 1) strip off time, 2) subtract the
-            //    number of days we are into the next week.
-            // Assumption (again): First day of week for pickup is Sunday
-            int createDayOfWeek = (int)createDateTime.DayOfWeek;
-            DateTime weekStartDate
-                = createDateTime.Date.AddDays(createDayOfWeek * -1);
-            DateTime orderCutoffTime = new DateTime();
-
-            // For Delivery, cutoff time is midnight yesterday.  Otherwise
-            //    it is 2 hours (randomly selected) ago.
-            if (delivery)
-            {
-                orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek);
-            }
-            else
-            {
-                orderCutoffTime = weekStartDate.AddDays(lastSlotDayOfWeek).Add(lastSlotTime).AddMinutes(-120);
-            }
-
-            if (createDateTime >= orderCutoffTime)
-            {
-                // Created after last appointment slot (less buffer)
-                // Need to set Start Date to following Sunday
-                weekStartDate = weekStartDate.AddDays(7);
-            }
-
-            return weekStartDate;
         }
     }
-}

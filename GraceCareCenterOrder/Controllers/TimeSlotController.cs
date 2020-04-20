@@ -49,13 +49,20 @@ namespace GraceCareCenterOrder.Controllers
 
             var service = CreateTimeSlotService();
 
+            if (service.GetTimeSlotByDayTime(model.DayOfWeekNum, model.Time).SlotId != 0)
+            {
+                ModelState.AddModelError("", "This Time Slot already exists. Please enter a different day or time");
+                ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
+                return View(model);
+            }
+
             if (service.CreateTimeSlot(model))
             {
-                TempData["SaveResult"] = $"'{model.DayOfWeekNum.ToString()} at {model.Time}' was created";
+                TempData["SaveResult"] = $"'{((DayOfWeek)model.DayOfWeekNum).ToString()} at {model.Time}' was created";
                 return RedirectToAction("Index");
             };
 
-            ModelState.AddModelError("", $"'{model.DayOfWeekNum.ToString()} at {model.Time}' could not be created.");
+            ModelState.AddModelError("", $"'{((DayOfWeek)model.DayOfWeekNum).ToString()} at {model.Time}' could not be created.");
             ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
             return View(model);
         }
@@ -115,13 +122,21 @@ namespace GraceCareCenterOrder.Controllers
 
             var service = CreateTimeSlotService();
 
+            int rtnId = service.GetTimeSlotByDayTime(model.DayOfWeekNum, model.Time).SlotId;
+            if (rtnId != id && rtnId != 0)
+            {
+                ModelState.AddModelError("", "Attempt to change this Time Slot to an existing Time Slot. Please enter a different day or time");
+                ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
+                return View(model);
+            }
+
             if (service.UpdateTimeSlot(model))
             {
-                TempData["SaveResult"] = $"'{model.DayOfWeekNum.ToString()} at {model.Time}' was updated.";
+                TempData["SaveResult"] = $"'{((DayOfWeek)model.DayOfWeekNum).ToString()} at {model.Time}' was updated.";
                 return RedirectToAction("Index");
             }
 
-            ModelState.AddModelError("", $"'{model.DayOfWeekNum.ToString()} at {model.Time}' could not be updated.");
+            ModelState.AddModelError("", $"'{((DayOfWeek)model.DayOfWeekNum).ToString()} at {model.Time}' could not be updated.");
             ViewBag.DayOfWeekNum = BuildDayOfWeekDropdown(model.DayOfWeekNum);
             return View(model);
         }
