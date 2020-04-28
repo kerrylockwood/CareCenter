@@ -11,7 +11,7 @@ using System.Web.Mvc;
 
 namespace GraceCareCenterOrder.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Associate")]
     public class CustomerController : Controller
     {
         // GET: Customer
@@ -21,35 +21,6 @@ namespace GraceCareCenterOrder.Controllers
             var model = service.GetCusts();
             return View(model);
         }
-
-        ////Move to OrderCreate - begin
-        //// GET: Customer/BarCode
-        //public ActionResult BarCodeDetails()
-        //{
-        //    return View();
-        //}
-
-        //// POST: Customer/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult BarCodeValidate(CustBarCode model)
-        //{
-        //    if (!ModelState.IsValid) return View(model);
-
-        //    var service = CreateCustomerService();
-
-        //    if (service.ValidateCustBarCode(model.BarCodeNumber) == null && model.BarCodeNumber > 0)
-        //    {
-        //        ModelState.AddModelError("", $"'{model.BarCodeNumber}' is not a valid Bar Code Number.  Please re-enter or contact a member of the Food Pantry team.");
-
-        //        return View(model);
-        //    };
-
-        //    TempData["BarCodeId"] = model.BarCodeId;
-        //    TempData["BarCodeNumber"] = model.BarCodeNumber;
-        //    return RedirectToAction("Create");
-        //}
-        ////Move to OrderCreate - end
 
         // Get: Customer/Create
         public ActionResult Create(bool isOrder, int barCodeId)

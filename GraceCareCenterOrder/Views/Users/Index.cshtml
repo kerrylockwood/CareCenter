@@ -1,0 +1,52 @@
+﻿@model IEnumerable<GraceCareCenterOrder.Models.UserRole>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>User Index</h2>
+
+<p>
+    @*@Html.ActionLink("Create New", "Create")*@
+</p>
+@if (TempData.ContainsKey("SaveResult"))
+{
+    <div class="Alert alert-success fade in" role="alert">
+        @ViewBag.SaveResult
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+        @TempData["SaveResult"]
+    </div>
+}
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.UserName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Role)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            @Html.HiddenFor(modelItem => item.UserId)
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Role)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { userId = item.UserId })
+                @*@Html.ActionLink("Details", "Details", new { /* userId=item.PrimaryKey */ }) |*@
+                @*@Html.ActionLink("Delete", "Delete", new { /* userId=item.PrimaryKey */ })*@
+            </td>
+        </tr>
+    }
+
+</table>

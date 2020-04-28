@@ -10,7 +10,7 @@ using System.Web.Mvc;
 
 namespace GraceCareCenterOrder.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Associate")]
     public class SubCatController : Controller
     {
         // GET: SubCategory
