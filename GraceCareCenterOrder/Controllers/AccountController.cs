@@ -19,8 +19,11 @@ namespace GraceCareCenterOrder.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
+        ApplicationDbContext ctx;
+
         public AccountController()
         {
+            ctx = new ApplicationDbContext();
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
@@ -76,7 +79,7 @@ namespace GraceCareCenterOrder.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -152,10 +155,18 @@ namespace GraceCareCenterOrder.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    //////////////////////////////////////////////////////////////////////
+                    //                                                                  //
+                    //// IMPORTANT: Change this back to Customer before going live!!!!  //
+                    //                                                                  //
+                    //var result1 = UserManager.AddToRole(user.Id, "Customer");
+                    var result1 = UserManager.AddToRole(user.Id, "Associate");
+                    //                                                                  //
+                    //////////////////////////////////////////////////////////////////////
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771

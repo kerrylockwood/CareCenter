@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CareData;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,6 +13,19 @@ namespace GraceCareCenterOrder.Controllers
     {
         public ActionResult Index()
         {
+            if (isAdminUser())
+            {
+                ViewBag.displayMenu = "Admin";
+            }
+            else if (isAssociateUser())
+            {
+                ViewBag.displayMenu = "Associate";
+            }
+            else if (isCustomerUser())
+            {
+                ViewBag.displayMenu = "Customer";
+            }
+
             return View();
         }
 
@@ -25,6 +41,69 @@ namespace GraceCareCenterOrder.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        // Determine if this is an "Admin" User
+        public bool isAdminUser()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = User.Identity;
+                ApplicationDbContext context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+                var s = userManager.GetRoles(user.GetUserId());
+                if (s[0].ToString() == "Admin")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Determine if this is an "Associate" User
+        public bool isAssociateUser()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = User.Identity;
+                ApplicationDbContext context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+                var s = userManager.GetRoles(user.GetUserId());
+                if (s[0].ToString() == "Associate" || s[0].ToString() == "Admin")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Determine if this is an "Customer" User
+        public bool isCustomerUser()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = User.Identity;
+                ApplicationDbContext context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+                var s = userManager.GetRoles(user.GetUserId());
+                if (s[0].ToString() == "Customer" || s[0].ToString() == "Associate" || s[0].ToString() == "Admin")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
         }
     }
 }

@@ -61,7 +61,6 @@ namespace CareServices
                 };
                 List<BarCodeList> queryList = query.ToList();
 
-                //return query.ToArray();
                 return queryList.ToArray();
             }
         }
@@ -74,9 +73,6 @@ namespace CareServices
                     new BarCodeDetail
                     {
                         BarCodeId = 0,
-                        //BarCodeNumber = 0,
-                        //CreateAt = DateTimeOffset.Now,
-                        //CreateName = null
                     };
             }
             using (var ctx = new ApplicationDbContext())
@@ -107,9 +103,6 @@ namespace CareServices
                     new BarCodeDetail
                     {
                         BarCodeId = 0,
-                        //BarCodeNumber = 0,
-                        //CreateAt = null,
-                        //CreateName = null
                     };
                 }
                 var entity =

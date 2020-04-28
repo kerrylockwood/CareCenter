@@ -13,7 +13,7 @@ using System.Web.Mvc;
 
 namespace GraceCareCenterOrder.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Associate")]
     public class ItemController : Controller
     {
 
@@ -36,19 +36,6 @@ namespace GraceCareCenterOrder.Controllers
             var sortedCatagoryList = sortedCatSubCatList.OrderBy(o => o.Value);
 
             ViewBag.SubCatId = sortedCatSubCatList;
-
-            //Type type = typeof(Item);
-            //PropertyInfo[] propertyInfo = type.GetProperties();
-
-            //foreach (PropertyInfo pInfo in propertyInfo)
-            //{
-            //    string test = pInfo.Name;
-            //}
-            //var test = "xx";
-            //var xxx = GetPropertyName(item.);
-            //Expression<Func<CareData.Item, System.ComponentModel.DataAnnotations.DisplayAttribute>> expression = i => i.MaxAllowed;
-            //var name = GetPropertyName<DisplayAttribute>(expression);
-            //var maxItems = CareData.Item
 
             return View();
         }
