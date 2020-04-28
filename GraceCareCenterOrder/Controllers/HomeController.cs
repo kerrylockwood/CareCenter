@@ -25,8 +25,8 @@ namespace GraceCareCenterOrder.Controllers
             {
                 ViewBag.displayMenu = "Customer";
             }
-            
-                return View();
+
+            return View();
         }
 
         public ActionResult About()
@@ -42,6 +42,8 @@ namespace GraceCareCenterOrder.Controllers
 
             return View();
         }
+
+        // Determine if this is an "Admin" User
         public bool isAdminUser()
         {
             if (User.Identity.IsAuthenticated)
@@ -62,6 +64,7 @@ namespace GraceCareCenterOrder.Controllers
             return false;
         }
 
+        // Determine if this is an "Associate" User
         public bool isAssociateUser()
         {
             if (User.Identity.IsAuthenticated)
@@ -82,6 +85,7 @@ namespace GraceCareCenterOrder.Controllers
             return false;
         }
 
+        // Determine if this is an "Customer" User
         public bool isCustomerUser()
         {
             if (User.Identity.IsAuthenticated)

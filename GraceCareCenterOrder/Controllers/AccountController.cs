@@ -159,7 +159,14 @@ namespace GraceCareCenterOrder.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    var result1 = UserManager.AddToRole(user.Id, "Customer");
+                    //////////////////////////////////////////////////////////////////////
+                    //                                                                  //
+                    //// IMPORTANT: Change this back to Customer before going live!!!!  //
+                    //                                                                  //
+                    //var result1 = UserManager.AddToRole(user.Id, "Customer");
+                    var result1 = UserManager.AddToRole(user.Id, "Associate");
+                    //                                                                  //
+                    //////////////////////////////////////////////////////////////////////
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771

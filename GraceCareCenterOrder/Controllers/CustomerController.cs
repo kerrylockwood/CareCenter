@@ -3,6 +3,7 @@ using CareModels.BarCodes;
 using CareModels.Customers;
 using CareServices;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,17 @@ using System.Web.Mvc;
 
 namespace GraceCareCenterOrder.Controllers
 {
-    [Authorize(Roles = "Admin,Associate")]
+    [Authorize]
     public class CustomerController : Controller
     {
         // GET: Customer
         public ActionResult Index()
         {
+            if (!isAdminUser() && !isAssociateUser())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var service = CreateCustomerService();
             var model = service.GetCusts();
             return View(model);
@@ -25,40 +31,45 @@ namespace GraceCareCenterOrder.Controllers
         // Get: Customer/Create
         public ActionResult Create(bool isOrder, int barCodeId)
         {
-            var userId = User.Identity.GetUserId();
-            var barCodeService = new BarCodeService(userId);
-
-            BarCode barCodeData = new BarCode();
-            if (barCodeId != 0)
+            if (isAdminUser() || isAssociateUser() || (isCustomerUser() && isOrder))
             {
-                BarCodeDetail barCodeDetail = barCodeService.GetBarCodeById(barCodeId);
-                barCodeData.BarCodeId = barCodeDetail.BarCodeId;
-                barCodeData.BarCodeNumber = barCodeDetail.BarCodeNumber;
-                // dummy data - don't need:
-                barCodeData.CreateAt = DateTimeOffset.Now;
-                barCodeData.CreateBy = "XX";
+                var userId = User.Identity.GetUserId();
+                var barCodeService = new BarCodeService(userId);
+
+                BarCode barCodeData = new BarCode();
+                if (barCodeId != 0)
+                {
+                    BarCodeDetail barCodeDetail = barCodeService.GetBarCodeById(barCodeId);
+                    barCodeData.BarCodeId = barCodeDetail.BarCodeId;
+                    barCodeData.BarCodeNumber = barCodeDetail.BarCodeNumber;
+                    // dummy data - don't need:
+                    barCodeData.CreateAt = DateTimeOffset.Now;
+                    barCodeData.CreateBy = "XX";
+                }
+
+                CustCreate model = new CustCreate
+                {
+                    CustomerId = 0,
+                    IsOrder = isOrder,
+                    BarCodeId = barCodeData.BarCodeId,
+                    BarCode = barCodeData,
+                    FirstName = null,
+                    LastName = null,
+                    Address = null,
+                    City = null,
+                    State = null,
+                    ZipCode = 0,
+                    Phone = null,
+                    Email = null,
+                    NumberKids = 0
+                };
+
+                ViewBag.BarCodeId = BuildBarCodeDropdown(0);
+
+                return View(model);
             }
 
-            CustCreate model = new CustCreate
-            {
-                CustomerId = 0,
-                IsOrder = isOrder,
-                BarCodeId = barCodeData.BarCodeId,
-                BarCode = barCodeData,
-                FirstName = null,
-                LastName = null,
-                Address = null,
-                City = null,
-                State = null,
-                ZipCode = 0,
-                Phone = null,
-                Email = null,
-                NumberKids = 0
-            };
-
-            ViewBag.BarCodeId = BuildBarCodeDropdown(0);
-
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
 
         // POST: Customer/Create
@@ -134,55 +145,66 @@ namespace GraceCareCenterOrder.Controllers
         // GET: Customer/Details
         public ActionResult Details(int id)
         {
-            var svc = CreateCustomerService();
-            var model = svc.GetCustById(id);
+            if (isAdminUser() || isAssociateUser())
+            {
 
-            return View(model);
+                var svc = CreateCustomerService();
+                var model = svc.GetCustById(id);
+
+                return View(model);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: Customer/Update
         public ActionResult Edit(bool isCust, bool isOrder, int id)
         {
-            var service = CreateCustomerService();
-            var detail = service.GetCustById(id);
-            var model =
-                new CustUpdate
-                {
-                    CustomerId = detail.CustomerId,
-                    IsOrder = isOrder,
-                    IsCust = isCust,
+            if (isAdminUser() || isAssociateUser() || (isCustomerUser() && isOrder))
+            {
+                var service = CreateCustomerService();
+                var detail = service.GetCustById(id);
+                var model =
+                    new CustUpdate
+                    {
+                        CustomerId = detail.CustomerId,
+                        IsOrder = isOrder,
+                        IsCust = isCust,
                     //BarCodeNumber = new BarCode(),
                     BarCodeId = detail.BarCodeId,
-                    FirstName = detail.FirstName,
-                    LastName = detail.LastName,
-                    Address = detail.Address,
-                    City = detail.City,
-                    State = detail.State,
-                    ZipCode = detail.ZipCode,
-                    Phone = detail.Phone,
-                    Email = detail.Email,
-                    NumberKids = detail.NumberKids
-                };
-            var userId = User.Identity.GetUserId();
-            var barCodeService = new BarCodeService(userId);
+                        FirstName = detail.FirstName,
+                        LastName = detail.LastName,
+                        Address = detail.Address,
+                        City = detail.City,
+                        State = detail.State,
+                        ZipCode = detail.ZipCode,
+                        Phone = detail.Phone,
+                        Email = detail.Email,
+                        NumberKids = detail.NumberKids
+                    };
+                var userId = User.Identity.GetUserId();
+                var barCodeService = new BarCodeService(userId);
 
-            // BarCodeId is null here if created by a Customer using Barcode Number of 0
-            int barCodeIdParm = 0;
-            if (detail.BarCodeId == null)
-            {
-                barCodeIdParm = 0;
-                model.BarCodeNumber = 0;
+                // BarCodeId is null here if created by a Customer using Barcode Number of 0
+                int barCodeIdParm = 0;
+                if (detail.BarCodeId == null)
+                {
+                    barCodeIdParm = 0;
+                    model.BarCodeNumber = 0;
+                }
+                else
+                {
+                    barCodeIdParm = (int)model.BarCodeId;
+                    var barCodeDetail = barCodeService.GetBarCodeById(barCodeIdParm);
+                    model.BarCodeNumber = barCodeDetail.BarCodeNumber;
+                }
+
+                ViewBag.BarCodeId = BuildBarCodeDropdown(barCodeIdParm);
+
+                return View(model);
             }
-            else
-            {
-                barCodeIdParm = (int)model.BarCodeId;
-                var barCodeDetail = barCodeService.GetBarCodeById(barCodeIdParm);
-                model.BarCodeNumber = barCodeDetail.BarCodeNumber;
-            }
 
-            ViewBag.BarCodeId = BuildBarCodeDropdown(barCodeIdParm);
-
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: Customer/Update
@@ -252,10 +274,15 @@ namespace GraceCareCenterOrder.Controllers
         // GET: Customer/Delete
         public ActionResult Delete(int id)
         {
-            var svc = CreateCustomerService();
+            if (isAdminUser() || isAssociateUser())
+            {
+                var svc = CreateCustomerService();
             var model = svc.GetCustById(id);
 
             return View(model);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: Customer/Delete
@@ -291,6 +318,69 @@ namespace GraceCareCenterOrder.Controllers
             var sortedBarCodeList = barCodeList.OrderBy(o => o.Text);
 
             return sortedBarCodeList;
+        }
+
+        // Determine if this is an "Admin" User
+        public bool isAdminUser()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = User.Identity;
+                ApplicationDbContext context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+                var s = userManager.GetRoles(user.GetUserId());
+                if (s[0].ToString() == "Admin")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Determine if this is an "Associate" User
+        public bool isAssociateUser()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = User.Identity;
+                ApplicationDbContext context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+                var s = userManager.GetRoles(user.GetUserId());
+                if (s[0].ToString() == "Associate" || s[0].ToString() == "Admin")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Determine if this is an "Customer" User
+        public bool isCustomerUser()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = User.Identity;
+                ApplicationDbContext context = new ApplicationDbContext();
+                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+                var s = userManager.GetRoles(user.GetUserId());
+                if (s[0].ToString() == "Customer" || s[0].ToString() == "Associate" || s[0].ToString() == "Admin")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
         }
     }
 }
