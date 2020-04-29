@@ -288,6 +288,8 @@
     <Content Include="Views\Order\PullOrder.cshtml" />
     <Content Include="Views\Users\Index.cshtml" />
     <Content Include="Views\Users\Edit.cshtml" />
+    <Content Include="Views\Account\AdminResetPasswordTkn.cshtml" />
+    <Content Include="Views\Account\AdminResetPassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

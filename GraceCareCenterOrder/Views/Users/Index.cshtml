@@ -42,7 +42,8 @@
                 @Html.DisplayFor(modelItem => item.Role)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { userId = item.UserId })
+                @Html.ActionLink("Edit Role", "Edit", new { userId = item.UserId }) |
+                @Html.ActionLink("Reset Password", "AdminResetPasswordTkn", "Account", new { userId = item.UserId }, null)
                 @*@Html.ActionLink("Details", "Details", new { /* userId=item.PrimaryKey */ }) |*@
                 @*@Html.ActionLink("Delete", "Delete", new { /* userId=item.PrimaryKey */ })*@
             </td>
