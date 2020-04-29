@@ -294,7 +294,7 @@ namespace GraceCareCenterOrder.Controllers
             var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
             {
-                TempData["SaveResult"] = $"Password reset for {model.UserName} was completed.";
+                TempData["SaveResult"] = $"Password reset for {model.UserName} completed successfully.";
                 return RedirectToAction("Index", "Users");
             }
             AddErrors(result);
