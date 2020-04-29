@@ -242,6 +242,66 @@ namespace GraceCareCenterOrder.Controllers
         }
 
         //
+        // GET: /Account/AdminResetPassword
+        //[AllowAnonymous]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> AdminResetPasswordTkn(string userId)
+        {
+            var user = await UserManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                TempData["SaveResult"] = $"User not found. Please retry.";
+                return RedirectToAction("Index");
+            }
+
+            string code = await UserManager.GeneratePasswordResetTokenAsync(userId);
+
+            return RedirectToAction("AdminResetPassword", new { userName = user.UserName, code });
+        }
+
+        //
+        // GET: /Account/AdminResetPassword
+        //[AllowAnonymous]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> AdminResetPassword(string userName, string code)
+        {
+            AdminResetPasswordViewModel model = new AdminResetPasswordViewModel();
+            var user = await UserManager.FindByNameAsync(userName);
+
+            model.UserName = userName;
+            model.Code = code;
+
+            return View(model);
+        }
+
+        //
+        // POST: /Account/ResetPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AdminResetPassword(AdminResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var user = await UserManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                TempData["SaveResult"] = $"Error resetting password for {model.UserName}. Please retry.";
+                return RedirectToAction("Index", "Users");
+            }
+            var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+            if (result.Succeeded)
+            {
+                TempData["SaveResult"] = $"Password reset for {model.UserName} was completed.";
+                return RedirectToAction("Index", "Users");
+            }
+            AddErrors(result);
+            return View(model);
+        }
+
+        //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
