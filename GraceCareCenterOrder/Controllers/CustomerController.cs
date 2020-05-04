@@ -170,8 +170,8 @@ namespace GraceCareCenterOrder.Controllers
                         CustomerId = detail.CustomerId,
                         IsOrder = isOrder,
                         IsCust = isCust,
-                    //BarCodeNumber = new BarCode(),
-                    BarCodeId = detail.BarCodeId,
+                        //BarCodeNumber = new BarCode(),
+                        BarCodeId = detail.BarCodeId,
                         FirstName = detail.FirstName,
                         LastName = detail.LastName,
                         Address = detail.Address,
@@ -277,9 +277,9 @@ namespace GraceCareCenterOrder.Controllers
             if (isAdminUser() || isAssociateUser())
             {
                 var svc = CreateCustomerService();
-            var model = svc.GetCustById(id);
+                var model = svc.GetCustById(id);
 
-            return View(model);
+                return View(model);
             }
 
             return RedirectToAction("Index", "Home");
