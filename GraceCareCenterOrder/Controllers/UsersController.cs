@@ -16,8 +16,22 @@ namespace GraceCareCenterOrder.Controllers
     public class UsersController : Controller
     {
         // GET: Users
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string searchData)
         {
+            ViewBag.SortName = String.IsNullOrEmpty(sortOrder) ? "Name_Desc" : "";
+            ViewBag.SortRole = String.IsNullOrEmpty(sortOrder) ? "Role_Ascend" : "Role_Desc";
+
+            //if (searchData != null)
+            //{
+            //    Page_No = 1;
+            //}
+            //else
+            //{
+            //    searchData = Filter_Value;
+            //}
+
+            ViewBag.FilterValue = searchData;
+
             ApplicationDbContext ctx = new ApplicationDbContext();
 
             var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(ctx));
@@ -49,6 +63,26 @@ namespace GraceCareCenterOrder.Controllers
                 model.Add(usrRole);
             }
 
+            if (!String.IsNullOrEmpty(searchData))
+            {
+                model = model.Where(m => m.UserName.ToUpper().Contains(searchData.ToUpper()) || m.Role.ToUpper().Contains(searchData.ToUpper())).ToList();
+            }
+
+            switch (sortOrder)
+            {
+                case "Name_Desc":
+                    model = model.OrderByDescending(m => m.UserName).ToList();
+                    break;
+                case "Role_Ascend":
+                    model = model.OrderBy(m => m.Role).ThenBy(m => m.UserName).ToList();
+                    break;
+                case "Role_Desc":
+                    model = model.OrderByDescending(m => m.Role).ThenByDescending(m => m.UserName).ToList();
+                    break;
+                default:
+                    model = model.OrderBy(m => m.UserName).ToList();
+                    break;
+            }
             return View(model);
         }
 

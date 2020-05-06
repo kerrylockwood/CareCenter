@@ -9,6 +9,15 @@
 <p>
     @*@Html.ActionLink("Create New", "Create")*@
 </p>
+
+@using (Html.BeginForm())
+{
+    <p>
+        Search: @Html.TextBox("searchData", ViewBag.FilterValue as string)
+        <input type="submit" value="Find" />
+    </p>
+}
+
 @if (TempData.ContainsKey("SaveResult"))
 {
     <div class="Alert alert-success fade in" role="alert">
@@ -23,10 +32,10 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.UserName)
+            @Html.ActionLink("User Name", "Index", new { sortOrder = ViewBag.SortName })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Role)
+            @Html.ActionLink("Role", "Index", new { sortOrder = ViewBag.SortRole })
         </th>
         <th></th>
     </tr>
@@ -45,8 +54,6 @@
                 @Html.ActionLink("Edit Role", "Edit", new { userId = item.UserId }) |
                 @Html.ActionLink("Reset Password", "AdminResetPasswordTkn", "Account", new { userId = item.UserId }, null) |
                 @Html.ActionLink("Edit Profile", "AdminChangeEmail", "Account", new { userId = item.UserId }, null)
-                @*@Html.ActionLink("Details", "Details", new { /* userId=item.PrimaryKey */ }) |*@
-                @*@Html.ActionLink("Delete", "Delete", new { /* userId=item.PrimaryKey */ })*@
             </td>
         </tr>
     }

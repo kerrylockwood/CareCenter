@@ -336,7 +336,7 @@ namespace GraceCareCenterOrder.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AdminChangeEmail(AdminChangeEmailViewModel model)
+        public ActionResult AdminChangeEmail(AdminChangeEmailViewModel model)
         {
             if (model.Email == model.EmailBefore && model.UserName == model.UserNameBefore)
             {
