@@ -1,4 +1,7 @@
-﻿@model IEnumerable<GraceCareCenterOrder.Models.UserRole>
+﻿@*@model IEnumerable<GraceCareCenterOrder.Models.UserRole>*@
+@model PagedList.IPagedList<GraceCareCenterOrder.Models.UserRole>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" />
 
 @{
     ViewBag.Title = "Index";
@@ -32,10 +35,10 @@
 <table class="table">
     <tr>
         <th>
-            @Html.ActionLink("User Name", "Index", new { sortOrder = ViewBag.SortName })
+            @Html.ActionLink("User Name", "Index", new { sortOrder = ViewBag.SortName, filterValue = ViewBag.FilterValue })
         </th>
         <th>
-            @Html.ActionLink("Role", "Index", new { sortOrder = ViewBag.SortRole })
+            @Html.ActionLink("Role", "Index", new { sortOrder = ViewBag.SortRole, filterValue = ViewBag.FilterValue })
         </th>
         <th></th>
     </tr>
@@ -59,3 +62,8 @@
     }
 
 </table>
+
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+@Html.PagedListPager(Model, pageNum => Url.Action("Index", new { pageNum, sortingOrder = ViewBag.CurrentSortOrder, filterValue = ViewBag.FilterValue }))
+

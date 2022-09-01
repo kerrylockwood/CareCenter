@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using PagedList;
 
 namespace GraceCareCenterOrder.Controllers
 {
@@ -16,19 +17,20 @@ namespace GraceCareCenterOrder.Controllers
     public class UsersController : Controller
     {
         // GET: Users
-        public ActionResult Index(string sortOrder, string searchData)
+        public ActionResult Index(string sortOrder, string searchData, string filterValue, int? pageNum)
         {
+            ViewBag.CurrentSortOrder = sortOrder;
             ViewBag.SortName = String.IsNullOrEmpty(sortOrder) ? "Name_Desc" : "";
             ViewBag.SortRole = String.IsNullOrEmpty(sortOrder) ? "Role_Ascend" : "Role_Desc";
 
-            //if (searchData != null)
-            //{
-            //    Page_No = 1;
-            //}
-            //else
-            //{
-            //    searchData = Filter_Value;
-            //}
+            if (searchData != null)
+            {
+                pageNum = 1;
+            }
+            else
+            {
+                searchData = filterValue;
+            }
 
             ViewBag.FilterValue = searchData;
 
@@ -83,7 +85,11 @@ namespace GraceCareCenterOrder.Controllers
                     model = model.OrderBy(m => m.UserName).ToList();
                     break;
             }
-            return View(model);
+
+            int sizeOfPage = 4;
+            int noOfPage = (pageNum ?? 1);
+
+            return View(model.ToPagedList(noOfPage, sizeOfPage));
         }
 
         // GET: Users/Update
